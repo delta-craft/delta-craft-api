@@ -1,4 +1,4 @@
-import { Get, Header, Param, Query, Res, StreamableFile } from "@nestjs/common";
+import { Get, Header, Param, Query, StreamableFile } from "@nestjs/common";
 import { Controller } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { EmbedService } from "./embed.service";
@@ -8,20 +8,20 @@ import { EmbedService } from "./embed.service";
 export class EmbedController {
   constructor(private readonly embedService: EmbedService) {}
 
-  @Get("player-head/:nick")
+  @Get("player-head/:uuid")
   @Header("content-type", "image/png")
   async getPlayerHead(
-    @Param("nick") nick: string,
+    @Param("uuid") uuid: string,
   ): Promise<StreamableFile | null> {
-    return await this.embedService.generatePlayerHead(nick);
+    return await this.embedService.generatePlayerHead(uuid);
   }
 
   @Get("player-head")
   @Header("content-type", "image/png")
   async getPlayerHeadQuery(
-    @Query("nick") nick: string,
+    @Query("uuid") uuid: string,
   ): Promise<StreamableFile | null> {
-    return await this.embedService.generatePlayerHead(nick);
+    return await this.embedService.generatePlayerHead(uuid);
   }
 
   @Get("player-home/:nick")

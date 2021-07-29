@@ -15,9 +15,26 @@ export class EmbedService {
     private readonly TeamsRepository: Repository<Teams>,
   ) {}
 
-  async generatePlayerHead(nick: string): Promise<StreamableFile | null> {
+  async generatePlayerHead(uuid: string): Promise<StreamableFile | null> {
+    const uConn = await this.uConnRepository.findOne({ where: { uid: uuid } });
+
+    if (!uConn) {
+      const img = await axios.get<ArrayBuffer>(
+        "https://minotar.net/skin/MHF_Steve",
+        {
+          responseType: "arraybuffer",
+        },
+      );
+
+      if (img.status !== 200) {
+        return null;
+      }
+
+      return this.asFile(img.data);
+    }
+
     const img = await axios.get<ArrayBuffer>(
-      `https://minotar.net/skin/${nick}`,
+      `https://minotar.net/skin/${uConn.name}`,
       {
         responseType: "arraybuffer",
       },
@@ -26,7 +43,6 @@ export class EmbedService {
     if (img.status !== 200) {
       return null;
     }
-
     return this.asFile(img.data);
   }
 

@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { mockUuid } from "src/utils/mockdata";
 
 interface IPointPartial {
   points: number;
@@ -23,13 +24,10 @@ class PointTagPartial implements IPointTagPartial {
 }
 
 class PointPartial implements IPointPartial {
-  @ApiProperty({
-    type: Number,
-  })
   @ApiProperty()
   points: number;
   @ApiProperty({
-    example: "5dfc3ded-e5fb-456d-b708-64d877348762",
+    example: mockUuid,
   })
   uuid: string;
   @ApiProperty()

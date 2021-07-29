@@ -3,8 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Points } from "src/db/entities/Points";
 import { PointTags } from "src/db/entities/PointTags";
 import { UserConnections } from "src/db/entities/UserConnections";
-import { PluginApiError, PointsError } from "src/types/ApiResponse";
-import { IServicePluginResponse } from "src/types/IServiceResponse";
+import {
+  IApiPluginResponse,
+  PluginApiError,
+  PointsError,
+} from "src/types/ApiResponse";
 import { IPointPartial } from "src/types/points/IPointsInput";
 import { filterUniqueInArray, isUuidValid } from "src/utils/checks";
 import { Repository } from "typeorm";
@@ -19,20 +22,8 @@ export class PointsService {
     @InjectRepository(UserConnections)
     private readonly ucRepository: Repository<UserConnections>,
   ) {}
-  getHello(): string {
-    return "Hello World!";
-  }
 
-  async getPoints(): Promise<Points[]> {
-    const ps = await this.pointsRepository.find({
-      /*relations: ["pointTags"] */
-    });
-    return ps;
-  }
-
-  async addPoints(
-    data: IPointPartial[],
-  ): Promise<IServicePluginResponse<boolean>> {
+  async addPoints(data: IPointPartial[]): Promise<IApiPluginResponse<boolean>> {
     const uuids = data
       .filter((x) => isUuidValid(x.uuid))
       .map((x) => x.uuid)

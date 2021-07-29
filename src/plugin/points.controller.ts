@@ -14,16 +14,10 @@ import { PointPartial } from "src/types/points/IPointsInput";
 import { PointsService } from "./points.service";
 
 @UseGuards(AuthGuard)
-@ApiTags("plugin", "points")
+@ApiTags("points")
 @Controller("points")
 export class PointsController {
   constructor(private readonly pointsService: PointsService) {}
-
-  @Get("all")
-  async getPoints(): Promise<IApiPluginResponse<Points[]>> {
-    const res = { content: await this.pointsService.getPoints() };
-    return res;
-  }
 
   @ApiBody({ type: [PointPartial] })
   @Post("add")
@@ -32,8 +26,6 @@ export class PointsController {
   async addPoints(
     @Body() data: PointPartial[],
   ): Promise<IApiPluginResponse<boolean>> {
-    const res = await this.pointsService.addPoints(data);
-
-    return { ...res };
+    return await this.pointsService.addPoints(data);
   }
 }

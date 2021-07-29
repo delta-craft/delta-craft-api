@@ -1,7 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { PointsModule } from "./plugin/points.module";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Consents } from "./db/entities/Consents";
@@ -22,10 +19,11 @@ import { UserConnections } from "./db/entities/UserConnections";
 import { EmbedModule } from "./embed/embed.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { PluginModule } from "./plugin/plugin.module";
 
 @Module({
   imports: [
-    PointsModule,
+    PluginModule,
     EmbedModule,
 
     /**
@@ -63,7 +61,5 @@ import { join } from "path";
       //autoLoadEntities: true,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

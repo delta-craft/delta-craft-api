@@ -12,7 +12,7 @@ const getBrowser = async () => {
   // const options = await getOptions(isDev);
   // const browser = await core.launch(options);
 
-  const browser = await playwright.chromium.launch();
+  const browser = await playwright.chromium.launch({ chromiumSandbox: false });
   return browser;
 };
 
