@@ -1,14 +1,16 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
 import { LoginData } from "src/types/ILogin";
 import ISessionResponse from "src/types/Sessions";
 import { SessionService } from "./session.service";
 
+@UseGuards(AuthGuard)
 @ApiTags("session")
 @Controller("session")
 export class SessionController {
-  constructor(private readonly sessionService: SessionService) {}
+  constructor(private readonly sessionService: SessionService) { }
 
   @Get("validate")
   async validateSession(

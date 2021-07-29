@@ -1,13 +1,15 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
 import { LoginData } from "src/types/ILogin";
 import { LoginService } from "./login.service";
 
+@UseGuards(AuthGuard)
 @ApiTags("login")
 @Controller("login")
 export class LoginController {
-  constructor(private readonly loginService: LoginService) {}
+  constructor(private readonly loginService: LoginService) { }
 
   @Post()
   async login(@Body() data: LoginData): Promise<IApiPluginResponse<boolean>> {
