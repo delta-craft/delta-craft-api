@@ -19,10 +19,21 @@ import { ServerLogins } from "./db/entities/ServerLogins";
 import { Sessions } from "./db/entities/Sessions";
 import { Teams } from "./db/entities/Teams";
 import { UserConnections } from "./db/entities/UserConnections";
+import { EmbedModule } from "./embed/embed.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 @Module({
   imports: [
     PointsModule,
+    EmbedModule,
+
+    /**
+     * Config
+     */
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "..", "assets"),
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: "mysql",
