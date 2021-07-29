@@ -1,7 +1,6 @@
 // const core = require("puppeteer-core");
 // const chrome = require("chrome-aws-lambda");
-//import * as playwright from "playwright-chromium";
-import * as playwright from "playwright-aws-lambda";
+import * as playwright from "playwright-chromium";
 
 interface Options {
   args: string[];
@@ -13,7 +12,7 @@ const getBrowser = async () => {
   // const options = await getOptions(isDev);
   // const browser = await core.launch(options);
 
-  const browser = await playwright.launchChromium();
+  const browser = await playwright.chromium.launch();
   return browser;
 };
 
