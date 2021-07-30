@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
@@ -12,6 +20,7 @@ export class LoginController {
   constructor(private readonly loginService: LoginService) {}
 
   @Post()
+  @HttpCode(200)
   async login(@Body() data: LoginData): Promise<IApiPluginResponse<boolean>> {
     return await this.loginService.newLogin(data);
   }
@@ -25,7 +34,7 @@ export class LoginController {
   }
 
   @Post("logout")
-  @Post("logout-All")
+  @HttpCode(200)
   async logout(): Promise<IApiPluginResponse<boolean>> {
     return await this.loginService.logoutAll();
   }

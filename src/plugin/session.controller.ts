@@ -10,7 +10,7 @@ import { SessionService } from "./session.service";
 @ApiTags("session")
 @Controller("session")
 export class SessionController {
-  constructor(private readonly sessionService: SessionService) { }
+  constructor(private readonly sessionService: SessionService) {}
 
   @Get("validate")
   async validateSession(
@@ -21,6 +21,7 @@ export class SessionController {
   }
 
   @Post("update")
+  @HttpCode(200)
   async updateSession(
     @Body() params: LoginData,
   ): Promise<IApiPluginResponse<boolean>> {
