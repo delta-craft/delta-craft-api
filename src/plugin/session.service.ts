@@ -60,6 +60,8 @@ export class SessionService {
       where: { connectionId: uConn.id },
     });
 
+    console.log(session);
+
     if (!session) {
       return {
         content: { success: false },
@@ -91,12 +93,10 @@ export class SessionService {
         message: "Login was either denied or IP has changed",
       };
     }
-
     if (
-      minutesBetween(new Date(), session.updated) > 10 ||
-      session.auth == null
+      minutesBetween(new Date(new Date().toISOString()), session.updated) > 10
     ) {
-      // Session has expired or never authenticated
+      // Session has expired
       // Clear any opened session and deny access
       session.updated = null;
       session.ip = null;
@@ -107,7 +107,23 @@ export class SessionService {
       return {
         content: { success: false },
         error: LoginError.SessionExpired,
-        message: "Session expired or was never authenticated",
+        message: "Session expired",
+      };
+    }
+
+    if (session.auth == null) {
+      // Session has expired
+      // Clear any opened session and deny access
+      session.updated = null;
+      session.ip = null;
+      session.auth = null;
+      session.authRequest = null;
+      await this.sessionRepository.save(session);
+
+      return {
+        content: { success: false },
+        error: LoginError.SessionExpired,
+        message: "Session was never authenticated",
       };
     }
 
@@ -124,6 +140,7 @@ export class SessionService {
 
     const t = { id: team.id, majorTeam: team.majorTeam, name: team.name };
 
+    console.log(t);
     return { content: { success: true, team: t }, message: "Hurray" };
   }
 

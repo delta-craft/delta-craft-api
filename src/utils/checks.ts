@@ -14,8 +14,17 @@ export const filterUniqueInArray = (value, index, self) =>
 export const minutesBetween = (date1: Date, date2: Date): number => {
   if (!date1 || !date2) return Number.POSITIVE_INFINITY;
 
-  const diff = Math.abs(date1.getTime() - date2.getTime());
+  const t1 = date1.getTime();
+  const t2 = date2.getTime();
 
-  return diff / (1000 * 60); // 60 seconds in a minute * 1000 milliseconds in a second
-  // return Math.round(((diff % 86400000) % 3600000) / 60000);
+  const diff = t1 > t2 ? t1 - t2 : t2 - t1; // Difference in ms timestamp format
+
+  // Works for now
+  return Math.round(((diff % 86400000) % 3600000) / 60000);
+
+  // TODO: Fix
+
+  // const dMins = Math.floor(diff / (1000 * 60)); // 60 seconds in a minute * 1000 milliseconds in a second
+  // console.log(dMins);
+  // return dMins;
 };
