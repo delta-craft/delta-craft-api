@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
