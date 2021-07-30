@@ -20,19 +20,20 @@ import { EmbedModule } from "./embed/embed.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { PluginModule } from "./plugin/plugin.module";
+import { GraphQLModule } from "@nestjs/graphql";
 
 @Module({
   imports: [
     PluginModule,
     EmbedModule,
 
-    /**
-     * Config
-     */
+    // Enable Static Files Serving
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "assets"),
     }),
+    // Enable ENV
     ConfigModule.forRoot({ isGlobal: true }),
+    // Configure TypeORM
     TypeOrmModule.forRoot({
       type: "mysql",
       host: process.env.DB_ADDRESS,
@@ -59,6 +60,14 @@ import { PluginModule } from "./plugin/plugin.module";
       ],
       synchronize: false,
       //autoLoadEntities: true,
+    }),
+    // Configure GraphQL
+    GraphQLModule.forRoot({
+      debug: false,
+      typePaths: ["./**/*.graphql"],
+      // definitions: {
+      //   path: join(process.cwd(), "src/graphql/graphql.ts"),
+      // },
     }),
   ],
 })
