@@ -9,7 +9,7 @@ import { LoginService } from "./login.service";
 @ApiTags("login")
 @Controller("login")
 export class LoginController {
-  constructor(private readonly loginService: LoginService) { }
+  constructor(private readonly loginService: LoginService) {}
 
   @Post()
   async login(@Body() data: LoginData): Promise<IApiPluginResponse<boolean>> {
@@ -21,7 +21,7 @@ export class LoginController {
     @Query("nick") nick: string,
     @Query("uuid") uuid: string,
   ): Promise<IApiPluginResponse<boolean>> {
-    return await this.loginService.validatePlayerJoin(nick, uuid);
+    return await this.loginService.validatePlayerJoin(uuid, nick);
   }
 
   @Post("logout")
