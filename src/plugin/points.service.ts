@@ -8,7 +8,7 @@ import {
   PluginApiError,
   PointsError,
 } from "src/types/ApiResponse";
-import { IPointPartial } from "src/types/points/IPointsInput";
+import { IPointPartial, PointTagPartial } from "src/types/points/IPointsInput";
 import { filterUniqueInArray, isUuidValid } from "src/utils/checks";
 import { Repository } from "typeorm";
 
@@ -57,6 +57,20 @@ export class PointsService {
       for (const uc of ucs) {
         const points = data.filter((x) => x.uuid === uc.uid);
 
+        const a = groupBy<IPointPartial>("pointType");
+
+        const pointsCatGroups = a(points);
+
+        for (const pointCatIndex in pointsCatGroups) {
+          const pointCat = pointsCatGroups[pointCatIndex];
+
+          switch (pointCatIndex) {
+            // Mining
+            case "1":
+              break;
+          }
+        }
+
         for (const point of points) {
           const p = new Points();
           p.userId = uc.id;
@@ -92,3 +106,12 @@ export class PointsService {
     };
   }
 }
+
+const groupBy =
+  <T = any>(key) =>
+  (array: T[]): { [pointType: string]: T[] } =>
+    array.reduce((objectsByKeyValue, obj) => {
+      const value = obj[key];
+      objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+      return objectsByKeyValue;
+    }, {});
