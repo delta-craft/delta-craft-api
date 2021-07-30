@@ -7,10 +7,11 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
 import { LoginData } from "src/types/ILogin";
+import { mockNick, mockUuid } from "src/utils/mockdata";
 import { LoginService } from "./login.service";
 
 @UseGuards(AuthGuard)
@@ -26,6 +27,8 @@ export class LoginController {
   }
 
   @Get("validate")
+  @ApiQuery({ name: "nick", example: mockNick })
+  @ApiQuery({ name: "uuid", example: mockUuid })
   async validate(
     @Query("nick") nick: string,
     @Query("uuid") uuid: string,
