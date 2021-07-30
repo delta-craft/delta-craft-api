@@ -42,7 +42,7 @@ type User {
   id: ID
   name: String
   image: String
-  userConnections: [UserConnections]
+  userConnection: UserConnections
 }
 
 type UserConnections {
@@ -71,6 +71,7 @@ type Team {
   teamColourHex: String
   majorTeam: String
   userConnections: [UserConnections]
+  pointSummary: PointSummaryWrapper
 }
 
 type PointSummaryMajor {
@@ -110,48 +111,26 @@ type PollVotes {
 }
 
 type Query {
-  test: String
-  getUsers: [User]
-  getUser: User
+  userConnections: [UserConnections]
+  user: User
   player(nickname: String!): UserConnections
   players: [UserConnections]
-  getTeams: [Team]
-  getTeam(id: ID!): Team
-  getPlayerPointSummary(id: ID!): PointSummaryWrapper
-  getTeamPointSummary(id: ID!): PointSummaryWrapper
-  getMajorTeamsSummary: PointSummaryMajor
+  teams: [Team]
+  team(id: ID!): Team
+  majorTeamsSummary: PointSummaryMajor
   loginSession: LoginSession
   consents: [Consent]
   poll(id: ID!): Poll
-  userPollVotes(id: ID!): [PollVotes]
   point(id: ID!): Point
 }
 
 type Mutation {
   updateNickname(nickname: String!): Boolean
-  updateTeam(name: String, colour: String): Boolean
+  updateTeam(name: String!): Boolean
   updateConsent: Boolean
   updateLoginSession(confirm: Boolean!): Boolean
   updateFcmToken(token: String!): Boolean
   createOrUpdateTeam(name: String!): Boolean
   joinTeam(code: String!): Boolean
   updateVote(optionId: ID!): Boolean
-}
-
-type Query {
-  test: String
-  getUsers: [User]
-  getUser: User
-  player(nickname: String!): UserConnections
-  players: [UserConnections]
-  getTeams: [Team]
-  getTeam(id: ID!): Team
-  getPlayerPointSummary(id: ID!): PointSummaryWrapper
-  getTeamPointSummary(id: ID!): PointSummaryWrapper
-  getMajorTeamsSummary: PointSummaryMajor
-  loginSession: LoginSession
-  consents: [Consent]
-  poll(id: ID!): Poll
-  userPollVotes(id: ID!): [PollVotes]
-  point(id: ID!): Point
 }

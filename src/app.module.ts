@@ -21,12 +21,13 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { PluginModule } from "./plugin/plugin.module";
 import { GraphQLModule } from "@nestjs/graphql";
+import { GQLModule } from "./graphql/graphql.module";
 
 @Module({
   imports: [
     PluginModule,
     EmbedModule,
-
+    GQLModule,
     // Enable Static Files Serving
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, "..", "assets"),
