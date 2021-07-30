@@ -9,14 +9,7 @@ export const generateHomeCard = async (
     const html = getHomeCardHtml(nick, teamColour);
 
     const file = await getScreenshot(html, true, 32, 32);
-    // res.setHeader("Content-Type", "image/png");
-    // res.statusCode = 200;
-    // if (!isLocal)
-    //   res.setHeader(
-    //     "Cache-Control",
-    //     `public, immutable, no-transform, s-maxage=3600, max-age=3600`,
-    //   );
-    // res.end(file);
+
     return file;
   } catch (err) {
     console.log(err);
