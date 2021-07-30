@@ -54,6 +54,7 @@ export class EmbedService {
     const uc = await this.uConnRepository.findOne({
       where: { name: nick },
     });
+
     if (!uc) {
       return this.asFile(null);
     }
@@ -66,7 +67,7 @@ export class EmbedService {
       return this.asFile(null);
     }
 
-    const teamColour = uc.teams[0].majorTeam ?? "black";
+    const teamColour = team.majorTeam ?? "black";
 
     const file = await generateHomeCard(nick, teamColour);
 
