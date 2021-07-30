@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ServerLogins } from "src/db/entities/ServerLogins";
 import { Sessions } from "src/db/entities/Sessions";
+import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
 import {
   IApiPluginResponse,
@@ -23,6 +24,8 @@ export class SessionService {
     private readonly sessionRepository: Repository<Sessions>,
     @InjectRepository(ServerLogins)
     private readonly serverLoginRepository: Repository<ServerLogins>,
+    @InjectRepository(Teams)
+    private readonly teamsRepository: Repository<Teams>,
   ) {}
 
   async validateSession(
@@ -45,7 +48,6 @@ export class SessionService {
 
     const uConn = await this.uConnRepository.findOne({
       where: { uid: uuid },
-      relations: ["teams"],
     });
 
     if (!uConn) {
@@ -93,9 +95,8 @@ export class SessionService {
         message: "Login was either denied or IP has changed",
       };
     }
-    if (
-      minutesBetween(new Date(new Date().toISOString()), session.updated) > 10
-    ) {
+
+    if (minutesBetween(new Date(), session.updated) > 10) {
       // Session has expired
       // Clear any opened session and deny access
       session.updated = null;
@@ -129,14 +130,16 @@ export class SessionService {
 
     await this.logLogin(uConn, ip);
 
-    if (!uConn.teams || uConn.teams.length < 1) {
+    const team = await this.teamsRepository.findOne({
+      where: { id: uConn.teamId },
+    });
+
+    if (!team) {
       return {
         content: { success: true, team: null },
         message: "Login success but user has no team",
       };
     }
-
-    const team = uConn.teams[0];
 
     const t = { id: team.id, majorTeam: team.majorTeam, name: team.name };
 

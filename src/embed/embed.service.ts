@@ -12,7 +12,7 @@ export class EmbedService {
     @InjectRepository(UserConnections)
     private readonly uConnRepository: Repository<UserConnections>,
     @InjectRepository(Teams)
-    private readonly TeamsRepository: Repository<Teams>,
+    private readonly teamsRepository: Repository<Teams>,
   ) {}
 
   async generatePlayerHead(uuid: string): Promise<StreamableFile | null> {
@@ -49,9 +49,16 @@ export class EmbedService {
   async generatePlayerHome(nick: string): Promise<StreamableFile> {
     const uc = await this.uConnRepository.findOne({
       where: { name: nick },
-      relations: ["teams"],
     });
     if (!uc) {
+      return this.asFile(null);
+    }
+
+    const team = await this.teamsRepository.findOne({
+      where: { id: uc.teamId },
+    });
+
+    if (!team) {
       return this.asFile(null);
     }
 
