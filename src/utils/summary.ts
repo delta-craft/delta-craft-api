@@ -1,9 +1,11 @@
 import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
 import { PointType } from "src/types/enums";
-import { IPointSummary } from "src/types/types";
+import { IPointSummary, IPointSummaryWrapper } from "src/types/types";
 
-export const calcPlayerSummary = (userConn: UserConnections) => {
+export const calcPlayerSummary = (
+  userConn: UserConnections,
+): IPointSummaryWrapper => {
   const { points } = userConn;
 
   let mining = 0;
@@ -30,7 +32,7 @@ export const calcPlayerSummary = (userConn: UserConnections) => {
   return { summary, ratios };
 };
 
-export const calcTeamSummary = (team: Teams) => {
+export const calcTeamSummary = (team: Teams): IPointSummaryWrapper => {
   let mining = 0;
   let crafting = 0;
   let warfare = 0;
@@ -82,4 +84,31 @@ export const totalPoints = (points: IPointSummary): number => {
 
   const total = mining + crafting + warfare + journey;
   return total;
+};
+
+export const calcMajorTeamSummary = (teams: Teams[]): IPointSummaryWrapper => {
+  let mining = 0;
+  let crafting = 0;
+  let warfare = 0;
+  let journey = 0;
+
+  for (const team of teams) {
+    const { summary } = calcTeamSummary(team);
+    const { mining: m, crafting: c, warfare: w, journey: j } = summary;
+    mining += m;
+    crafting += c;
+    warfare += w;
+    journey += j;
+  }
+
+  const summary: IPointSummary = {
+    mining,
+    crafting,
+    warfare,
+    journey,
+  };
+
+  const ratios = calculateRatios(summary);
+
+  return { summary, ratios };
 };

@@ -4,3 +4,8 @@ export interface IPointSummary {
   warfare: number;
   journey: number;
 }
+
+export interface IPointSummaryWrapper {
+  ratios: IPointSummary;
+  summary: IPointSummary;
+}
