@@ -32,8 +32,8 @@ export class LoginSessionResolver {
     return res;
   }
 
-  @Mutation("updateNickname")
-  async updateNickname(
+  @Mutation("updateLoginSession")
+  async updateLoginSession(
     @User() user: UserConnections,
     @Args("confirm") confirm: boolean,
   ): Promise<boolean> {
