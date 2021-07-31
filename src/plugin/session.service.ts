@@ -96,7 +96,9 @@ export class SessionService {
       };
     }
 
-    if (minutesBetween(new Date(), session.updated) > 10) {
+    const timeDiff = minutesBetween(new Date(), session.updated);
+
+    if (timeDiff > 10) {
       // Session has expired
       // Clear any opened session and deny access
       session.updated = null;
@@ -108,7 +110,7 @@ export class SessionService {
       return {
         content: { success: false },
         error: LoginError.SessionExpired,
-        message: "Session expired",
+        message: `Session expired (time diff was ${timeDiff})`,
       };
     }
 
