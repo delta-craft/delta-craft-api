@@ -76,7 +76,7 @@ export class SessionService {
       return {
         content: { success: false },
         error: LoginError.SessionExpired,
-        message: "Session expired",
+        message: "Session not requested or not active",
       };
     }
 

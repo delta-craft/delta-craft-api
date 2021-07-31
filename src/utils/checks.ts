@@ -21,7 +21,10 @@ export const minutesBetween = (date1: Date, date2: Date): number => {
   const d = Math.abs(diff);
 
   // Works for now
-  return Math.round(((d % 86400000) % 3600000) / 60000);
+  const minDiff = Math.round(((d % 86400000) % 3600000) / 60000);
+  console.log(minDiff);
+
+  return minDiff;
 
   // TODO: Fix
 
