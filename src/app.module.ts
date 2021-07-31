@@ -69,6 +69,8 @@ import { GQLModule } from "./graphql/graphql.module";
       // definitions: {
       //   path: join(process.cwd(), "src/graphql/graphql.ts"),
       // },
+      // playground: true,
+      plugins: [],
     }),
   ],
 })
