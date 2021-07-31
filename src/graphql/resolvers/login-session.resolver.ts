@@ -43,6 +43,16 @@ export class LoginSessionResolver {
 
     if (!session) return false;
 
+    // If session not requested first
+    if (!session.authRequest) {
+      return false;
+    }
+
+    // If session expired
+    if (minutesBetween(new Date(), session.authRequest) > 10) {
+      return false;
+    }
+
     try {
       if (confirm) {
         session.auth = true;

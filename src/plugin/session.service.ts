@@ -143,7 +143,6 @@ export class SessionService {
 
     const t = { id: team.id, majorTeam: team.majorTeam, name: team.name };
 
-    console.log(t);
     return { content: { success: true, team: t }, message: "Hurray" };
   }
 
