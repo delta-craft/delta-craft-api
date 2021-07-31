@@ -18,9 +18,13 @@ export const minutesBetween = (date1: Date, date2: Date): number => {
   const t2 = date2.getTime();
 
   const diff = t1 > t2 ? t1 - t2 : t2 - t1; // Difference in ms timestamp format
+  const d = Math.abs(diff);
 
   // Works for now
-  return Math.round(((diff % 86400000) % 3600000) / 60000);
+  const minDiff = Math.round(((d % 86400000) % 3600000) / 60000);
+  console.log(minDiff);
+
+  return minDiff;
 
   // TODO: Fix
 

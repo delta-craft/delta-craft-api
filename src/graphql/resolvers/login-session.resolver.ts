@@ -38,10 +38,20 @@ export class LoginSessionResolver {
     @Args("confirm") confirm: boolean,
   ): Promise<boolean> {
     const session = await this.sessionRepository.findOne({
-      where: { id: user.id },
+      where: { connectionId: user.id },
     });
 
     if (!session) return false;
+
+    // If session not requested first
+    if (!session.authRequest) {
+      return false;
+    }
+
+    // If session expired
+    if (minutesBetween(new Date(), session.authRequest) > 10) {
+      return false;
+    }
 
     try {
       if (confirm) {

@@ -33,6 +33,8 @@
     "apollo-server-express": "2.25.2",
     "axios": "^0.21.1",
     "graphql": "^15.5.1",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "mysql2": "^2.2.5",
     "playwright-chromium": "^1.13.1",
     "reflect-metadata": "^0.1.13",
