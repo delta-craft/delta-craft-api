@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { BotGateway } from "src/bot/bot.service";
 import { Points } from "src/db/entities/Points";
 import { PointTags } from "src/db/entities/PointTags";
 import { UserConnections } from "src/db/entities/UserConnections";
@@ -21,6 +22,8 @@ export class PointsService {
     private readonly pointTagsRepository: Repository<PointTags>,
     @InjectRepository(UserConnections)
     private readonly ucRepository: Repository<UserConnections>,
+    @Inject(BotGateway)
+    private readonly bg: BotGateway,
   ) {}
 
   async addPoints(data: IPointPartial[]): Promise<IApiPluginResponse<boolean>> {
@@ -100,6 +103,8 @@ export class PointsService {
         message: err?.toString(),
       };
     }
+
+    await this.bg.sendMsg();
 
     return {
       content: true,
