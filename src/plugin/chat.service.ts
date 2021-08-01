@@ -1,9 +1,15 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
+import { BotNotificationService } from "src/bot/notification.service";
 import { IApiPluginResponse } from "src/types/ApiResponse";
 import resolveMessage, { Positivity } from "src/utils/wit-client";
 
 @Injectable()
 export class ChatService {
+  constructor(
+    @Inject(BotNotificationService)
+    private readonly botNotifications: BotNotificationService,
+  ) {}
+
   async checkMessage(message: string): Promise<IApiPluginResponse<boolean>> {
     const witResult = await resolveMessage(encodeURI(message));
     if (!witResult) {
@@ -26,6 +32,8 @@ export class ChatService {
       const words = entities["blacklist:blacklist"]
         .map((x) => `${x.body} (${x.value})`)
         .join(", ");
+
+        await this.botNotifications.inappropriateMessage(message);
 
       return { content: false, message: words };
     }

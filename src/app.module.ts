@@ -22,6 +22,8 @@ import { join } from "path";
 import { PluginModule } from "./plugin/plugin.module";
 import { GraphQLModule } from "@nestjs/graphql";
 import { GQLModule } from "./graphql/graphql.module";
+import { BotModule } from "./bot/bot.module";
+import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { GQLModule } from "./graphql/graphql.module";
     }),
     // Enable ENV
     ConfigModule.forRoot({ isGlobal: true }),
+    // Discord bot module
+    BotModule,
     // Configure TypeORM
     TypeOrmModule.forRoot({
       type: "mysql",
@@ -58,6 +62,7 @@ import { GQLModule } from "./graphql/graphql.module";
         PollOptions,
         PollVotes,
         ServerLogins,
+        DiscordsrvAccounts,
       ],
       synchronize: false,
       //autoLoadEntities: true,

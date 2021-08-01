@@ -18,6 +18,7 @@ import { LoginService } from "./login.service";
 import { FcmTokens } from "src/db/entities/FcmTokens";
 import { ServerLogins } from "src/db/entities/ServerLogins";
 import { Consents } from "src/db/entities/Consents";
+import { BotModule } from "src/bot/bot.module";
 
 @Module({
   imports: [
@@ -29,8 +30,9 @@ import { Consents } from "src/db/entities/Consents";
       Teams,
       FcmTokens,
       ServerLogins,
-      Consents
+      Consents,
     ]),
+    BotModule,
   ],
   controllers: [
     PointsController,
