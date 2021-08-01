@@ -1,22 +1,21 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { ApiRequestTimeoutResponse } from "@nestjs/swagger";
 import { InjectRepository } from "@nestjs/typeorm";
-import {
-  Once,
-  DiscordClientProvider,
-  OnCommand,
-  ClientProvider,
-} from "discord-nestjs";
+import { DiscordClientProvider, OnCommand } from "discord-nestjs";
 import { Message, MessageEmbed, TextChannel } from "discord.js";
 import { DiscordsrvAccounts } from "src/db/entities/DiscordsrvAccounts";
 import { UserConnections } from "src/db/entities/UserConnections";
 import { calcPlayerSummary } from "src/utils/summary";
 import { Repository } from "typeorm";
+import { UserResolverService } from "../resolver.service";
 
 @Injectable()
-export class BotService {
-  private readonly logger = new Logger(BotService.name);
+export class PointsCommand {
+  private readonly logger = new Logger(PointsCommand.name);
 
   constructor(
+    @Inject(UserResolverService)
+    private readonly userResolver: UserResolverService,
     private readonly discordProvider: DiscordClientProvider,
     @InjectRepository(UserConnections)
     private readonly uConnRepository: Repository<UserConnections>,
@@ -24,33 +23,44 @@ export class BotService {
     private readonly discordSrvRepository: Repository<DiscordsrvAccounts>,
   ) {}
 
-  @Once({ event: "ready" })
-  onReady(): void {
-    this.logger.log(
-      `Logged in as ${this.discordProvider.getClient().user.tag}!`,
-    );
-    // this.discordProvider..send("hello bot is up!");
-  }
-
   @OnCommand({ name: "points" })
   async onCommand(message: Message): Promise<void> {
     const author = message.author;
 
     if (author.bot) return;
 
-    const channel = message.channel;
+    const channel = message.channel as TextChannel;
 
-    const user = await this.discordSrvRepository.findOne({
-      where: { discord: author.id },
-    });
+    if (message.mentions.users.size > 0 && message.mentions.users.size < 3) {
+      for (const user of message.mentions.users) {
+        const uid = user[0];
+        await this.sendPointsCard(uid, channel);
+      }
+      //const uId = message.mentions.users.first().id;
+      //await this.sendPointsCard(uId, channel);
+      return;
+    }
 
+    if (message.mentions.users.size >= 3) {
+      await channel.send("To je moc");
+      return;
+    }
+
+    await this.sendPointsCard(author.id, channel);
+  }
+
+  private async sendPointsCard(
+    discordId: string,
+    channel: TextChannel,
+  ): Promise<void> {
+    const user = await this.userResolver.getUserConnection(discordId);
     if (!user) {
-      await channel.send("Account not linked");
+      await channel.send("User invalid");
       return;
     }
 
     const uc = await this.uConnRepository.findOne({
-      where: { uid: user.uuid },
+      where: { id: user.id },
       relations: ["points", "points.pointTags", "team"],
     });
 
@@ -59,9 +69,9 @@ export class BotService {
       return;
     }
 
-    const { summary, ratios } = calcPlayerSummary(uc);
+    const { summary } = calcPlayerSummary(uc);
 
-    const exampleEmbed = new MessageEmbed()
+    const pointsEmbed = new MessageEmbed()
       .setColor("#0099ff")
       .setTitle("Bodíková kartička")
       .setAuthor(
@@ -79,19 +89,6 @@ export class BotService {
       .setTimestamp()
       .setURL(`https://portal.deltacraft.eu/players/${uc.name}`);
 
-    const msg = await message.channel.send(exampleEmbed);
-  }
-
-  async sendMsg() {
-    const client = this.discordProvider.getClient();
-    const channel = client.channels.cache.find(
-      (x) => x.id === "871182344038547526",
-    );
-    if (!channel) {
-      this.logger.error("Channel not found");
-      return;
-    }
-
-    await (channel as TextChannel).send("test");
+    const msg = await channel.send(pointsEmbed);
   }
 }

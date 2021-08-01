@@ -1,14 +1,25 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { DiscordClientProvider } from "discord-nestjs";
+import { DiscordClientProvider, Once } from "discord-nestjs";
 import { MessageEmbed, TextChannel } from "discord.js";
 
-const channelId = "871182344038547526";
+const channelId = "871408932403417139";
 
 @Injectable()
 export class BotNotificationService {
   private readonly logger = new Logger(BotNotificationService.name);
 
   constructor(private readonly discordProvider: DiscordClientProvider) {}
+
+  @Once({ event: "ready" })
+  onReady(): void {
+    this.logger.log(
+      `Logged in as ${this.discordProvider.getClient().user.tag}!`,
+    );
+
+    const channel = this.getLogChannel();
+    if (!channel) return;
+    //channel.send("Ready");
+  }
 
   private getLogChannel(): TextChannel {
     const channel = this.discordProvider

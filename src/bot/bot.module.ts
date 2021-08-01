@@ -5,8 +5,10 @@ import { DiscordModule, TransformPipe, ValidationPipe } from "discord-nestjs";
 import { DiscordsrvAccounts } from "src/db/entities/DiscordsrvAccounts";
 import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
-import { BotService } from "./bot.service";
+import { CompareCommand } from "./commands/compare.service";
+import { PointsCommand } from "./commands/points.service";
 import { BotNotificationService } from "./notification.service";
+import { UserResolverService } from "./resolver.service";
 
 @Module({
   imports: [
@@ -14,12 +16,17 @@ import { BotNotificationService } from "./notification.service";
     // Jinak není process.env dostupný tady
     ConfigModule.forRoot(),
     DiscordModule.forRoot({
-      commandPrefix: ".",
+      commandPrefix: "!",
       token: process.env.DISCORD_POINTS_TOKEN,
       usePipes: [TransformPipe, ValidationPipe],
     }),
   ],
-  providers: [BotService, BotNotificationService],
+  providers: [
+    UserResolverService,
+    PointsCommand,
+    CompareCommand,
+    BotNotificationService,
+  ],
   exports: [BotNotificationService],
 })
 export class BotModule {}
