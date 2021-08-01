@@ -85,7 +85,7 @@ export class PointsCommand {
         { name: "Warfare", value: summary.warfare, inline: true },
         { name: "Journey", value: summary.journey, inline: true },
       )
-      .setImage(`https://api.deltacraft.eu/embed/player/${uc.name}`)
+      .setImage(`https://cdn.deltacraft.eu/embed/player/${uc.name}`)
       .setTimestamp()
       .setURL(`https://portal.deltacraft.eu/players/${uc.name}`);
 

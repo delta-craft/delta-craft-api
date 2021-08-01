@@ -7,6 +7,7 @@ import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
 import { CompareCommand } from "./commands/compare.service";
 import { PointsCommand } from "./commands/points.service";
+import { TeamCommand } from "./commands/team.service";
 import { BotNotificationService } from "./notification.service";
 import { UserResolverService } from "./resolver.service";
 
@@ -25,6 +26,7 @@ import { UserResolverService } from "./resolver.service";
     UserResolverService,
     PointsCommand,
     CompareCommand,
+    TeamCommand,
     BotNotificationService,
   ],
   exports: [BotNotificationService],

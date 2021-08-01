@@ -80,39 +80,15 @@ export class CompareCommand {
       return;
     }
 
-    const { summary: sumP1 } = calcPlayerSummary(uc1);
-    const { summary: sumP2 } = calcPlayerSummary(uc2);
-
-    const p1String = `
-    ${uc1.name}\n\n
-    Mining\n
-    ${sumP1.mining}\n\n
-    Crafting\n
-    ${sumP1.crafting}\n\n
-    Warfare\n
-    ${sumP1.warfare}\n\n
-     Journey\n
-    ${sumP1.journey}\n\n
-    `;
-
-    const p2String = `
-    ${uc2.name}\n\n
-    Mining\n
-    ${sumP2.mining}\n\n
-    Crafting\n
-    ${sumP2.crafting}\n\n
-    Warfare\n
-    ${sumP2.warfare}\n\n
-     Journey\n
-    ${sumP2.journey}\n\n
-    `;
-
     const comparisonEmbed = new MessageEmbed()
       .setColor("#0099ff")
       .setTitle("Comparison")
       .addFields(
-        { name: p1String, value: "\u200B", inline: true },
-        { name: p2String, value: "\u200B", inline: true },
+        { name: uc1.name, value: uc1.team?.name, inline: true },
+        { name: uc2.name, value: uc2.team?.name, inline: true },
+      )
+      .setImage(
+        `https://cdn.deltacraft.eu/embed/player/compare/${uc1.name}/${uc2.name}`,
       )
       .setTimestamp();
 
