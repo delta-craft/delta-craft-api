@@ -24,6 +24,7 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { GQLModule } from "./graphql/graphql.module";
 import { BotModule } from "./bot/bot.module";
 import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
+import { SentryModule } from "@ntegral/nestjs-sentry";
 
 @Module({
   imports: [
@@ -76,6 +77,12 @@ import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
       // },
       // playground: true,
       plugins: [],
+    }),
+    SentryModule.forRoot({
+      dsn: process.env.SENTRY_DSN,
+      debug: true,
+      environment: "dev",
+      release: null,
     }),
   ],
 })
