@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Consents } from "./db/entities/Consents";
@@ -28,6 +28,7 @@ import { SentryModule } from "@ntegral/nestjs-sentry";
 import { LogLevel } from '@sentry/types';
 import { APP_FILTER } from "@nestjs/core";
 import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
+import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 
 @Module({
   imports: [
@@ -96,4 +97,8 @@ import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
     }
   ]
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SetryLoggerMiddleware).forRoutes("*")
+  }
+}
