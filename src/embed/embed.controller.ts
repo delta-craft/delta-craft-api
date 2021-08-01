@@ -46,6 +46,17 @@ export class EmbedController {
     return await this.embedService.generatePlayerCard(nick);
   }
 
+  @Get("player/compare/:nick1/:nick2")
+  @ApiParam({ name: "nick1", example: mockNick })
+  @ApiParam({ name: "nick2", example: mockNick })
+  @Header("content-type", "image/png")
+  async getCompareCard(
+    @Param("nick1") nick1: string,
+    @Param("nick2") nick2: string,
+  ): Promise<EmbedFile> {
+    return await this.embedService.generateCompareCard(nick1, nick2);
+  }
+
   @Get("team/:id")
   @Header("content-type", "image/png")
   @ApiParam({ name: "id", example: "1" })

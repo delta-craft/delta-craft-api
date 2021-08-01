@@ -7,6 +7,7 @@ import { calcPlayerSummary } from "src/utils/summary";
 import { Repository } from "typeorm";
 import { getScreenshotUrl } from "./embed/get-screenshot";
 import { generatePlayerCard } from "./embed/player-card";
+import { generatePlayerComparisonCard } from "./embed/player-comparison-card";
 import { generateHomeCard } from "./embed/player-home";
 import { getTeamCard } from "./embed/team-card";
 
@@ -94,6 +95,50 @@ export class EmbedService {
       team?.name,
       summary,
       ratios,
+    );
+
+    return new StreamableFile(file);
+  }
+
+  async generateCompareCard(
+    nick1: string,
+    nick2: string,
+  ): Promise<StreamableFile> {
+    const uc1 = await this.uConnRepository.findOne({
+      where: { name: nick1 },
+      relations: ["points", "points.pointTags", "team"],
+    });
+
+    const uc2 = await this.uConnRepository.findOne({
+      where: { name: nick2 },
+      relations: ["points", "points.pointTags", "team"],
+    });
+
+    if (!uc1 || !uc2) {
+      return null;
+    }
+
+    const { team: team1 } = uc1;
+    const { team: team2 } = uc2;
+
+    const { summary: sum1, ratios: ratios1 } = calcPlayerSummary(uc1);
+    const { summary: sum2, ratios: ratios2 } = calcPlayerSummary(uc2);
+
+    const file = await generatePlayerComparisonCard(
+      {
+        nick: nick1,
+        teamName: team1?.name,
+        teamColour: team1?.majorTeam,
+        ratios: ratios1,
+        summary: sum1,
+      },
+      {
+        nick: nick2,
+        teamName: team2?.name,
+        teamColour: team2?.majorTeam,
+        ratios: ratios2,
+        summary: sum2,
+      },
     );
 
     return new StreamableFile(file);
