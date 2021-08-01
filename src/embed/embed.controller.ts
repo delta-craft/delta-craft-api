@@ -1,6 +1,6 @@
 import { Get, Header, Param, Query, StreamableFile } from "@nestjs/common";
 import { Controller } from "@nestjs/common";
-import { ApiParam, ApiProperty, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { mockNick, mockUuid } from "src/utils/mockdata";
 import { EmbedService } from "./embed.service";
 
