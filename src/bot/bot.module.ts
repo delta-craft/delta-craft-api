@@ -5,7 +5,8 @@ import { DiscordModule, TransformPipe, ValidationPipe } from "discord-nestjs";
 import { DiscordsrvAccounts } from "src/db/entities/DiscordsrvAccounts";
 import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
-import { BotGateway } from "./bot.service";
+import { BotService } from "./bot.service";
+import { BotNotificationService } from "./notification.service";
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { BotGateway } from "./bot.service";
       usePipes: [TransformPipe, ValidationPipe],
     }),
   ],
-  providers: [BotGateway],
-  exports: [BotGateway],
+  providers: [BotService, BotNotificationService],
+  exports: [BotNotificationService],
 })
 export class BotModule {}

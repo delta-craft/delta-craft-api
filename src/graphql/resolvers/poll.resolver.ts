@@ -8,7 +8,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { InjectRepository } from "@nestjs/typeorm";
-import { BotGateway } from "src/bot/bot.service";
+import { BotService } from "src/bot/bot.service";
 import { PollOptions } from "src/db/entities/PollOptions";
 import { Polls } from "src/db/entities/Polls";
 import { PollVotes } from "src/db/entities/PollVotes";

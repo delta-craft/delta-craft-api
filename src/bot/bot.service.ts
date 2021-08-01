@@ -13,8 +13,8 @@ import { calcPlayerSummary } from "src/utils/summary";
 import { Repository } from "typeorm";
 
 @Injectable()
-export class BotGateway {
-  private readonly logger = new Logger(BotGateway.name);
+export class BotService {
+  private readonly logger = new Logger(BotService.name);
 
   constructor(
     private readonly discordProvider: DiscordClientProvider,

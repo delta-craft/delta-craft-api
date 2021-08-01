@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { BotGateway } from "src/bot/bot.service";
+import { BotNotificationService } from "src/bot/notification.service";
 import { Points } from "src/db/entities/Points";
 import { PointTags } from "src/db/entities/PointTags";
 import { UserConnections } from "src/db/entities/UserConnections";
@@ -9,7 +9,7 @@ import {
   PluginApiError,
   PointsError,
 } from "src/types/ApiResponse";
-import { IPointPartial, PointTagPartial } from "src/types/points/IPointsInput";
+import { IPointPartial } from "src/types/points/IPointsInput";
 import { filterUniqueInArray, isUuidValid } from "src/utils/checks";
 import { Repository } from "typeorm";
 
@@ -22,8 +22,8 @@ export class PointsService {
     private readonly pointTagsRepository: Repository<PointTags>,
     @InjectRepository(UserConnections)
     private readonly ucRepository: Repository<UserConnections>,
-    @Inject(BotGateway)
-    private readonly bg: BotGateway,
+    @Inject(BotNotificationService)
+    private readonly botNotifications: BotNotificationService,
   ) {}
 
   async addPoints(data: IPointPartial[]): Promise<IApiPluginResponse<boolean>> {
@@ -104,7 +104,7 @@ export class PointsService {
       };
     }
 
-    await this.bg.sendMsg();
+    await this.botNotifications.logPoints();
 
     return {
       content: true,
