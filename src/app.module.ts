@@ -25,6 +25,9 @@ import { GQLModule } from "./graphql/graphql.module";
 import { BotModule } from "./bot/bot.module";
 import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
 import { SentryModule } from "@ntegral/nestjs-sentry";
+import { LogLevel } from '@sentry/types';
+import { APP_FILTER } from "@nestjs/core";
+import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 
 @Module({
   imports: [
@@ -83,7 +86,14 @@ import { SentryModule } from "@ntegral/nestjs-sentry";
       debug: true,
       environment: "dev",
       release: null,
+      logLevel: LogLevel.Debug,
     }),
   ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryExceptionFilter
+    }
+  ]
 })
-export class AppModule {}
+export class AppModule { }
