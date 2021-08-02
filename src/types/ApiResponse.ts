@@ -1,3 +1,5 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export enum PluginApiError {
   NotImplemented = "not_implemented",
   Unauthorized = "unauthorized",
@@ -31,5 +33,14 @@ export enum PointsError {
 export interface IApiPluginResponse<T = any> {
   content?: T;
   error?: PluginApiError | ValidateError | PointsError | LoginError;
+  message?: string;
+}
+
+export class BoolApiResponse implements IApiPluginResponse<boolean> {
+  @ApiProperty()
+  content?: boolean;
+  @ApiProperty()
+  error?: PluginApiError | ValidateError | PointsError | LoginError;
+  @ApiProperty()
   message?: string;
 }

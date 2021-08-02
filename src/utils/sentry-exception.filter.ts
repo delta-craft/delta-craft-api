@@ -7,14 +7,14 @@ import { PluginApiError } from 'src/types/ApiResponse';
 export class SentryExceptionFilter<T> implements ExceptionFilter {
   public constructor(@InjectSentry() private readonly client: SentryService) { }
 
-  async catch(exception: T, host: ArgumentsHost) {
+  catch(exception: T, host: ArgumentsHost) {
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    this.writeResponse(response, status, request);
+    this.writeResponse(response, status);
 
     if (status == HttpStatus.UNAUTHORIZED) {
       return
@@ -36,7 +36,7 @@ export class SentryExceptionFilter<T> implements ExceptionFilter {
     })
   }
 
-  private writeResponse(response: Response, status: HttpStatus, request: Request) {
+  private writeResponse(response: Response, status: HttpStatus) {
     response.status(status).json({
       error: PluginApiError.Unknown,
       content: null,
