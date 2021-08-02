@@ -25,7 +25,7 @@ import { GQLModule } from "./graphql/graphql.module";
 import { BotModule } from "./bot/bot.module";
 import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
 import { SentryModule } from "@ntegral/nestjs-sentry";
-import { LogLevel } from '@sentry/types';
+import { LogLevel } from "@sentry/types";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
@@ -70,6 +70,7 @@ import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
         DiscordsrvAccounts,
       ],
       synchronize: false,
+      timezone: "Z",
       //autoLoadEntities: true,
     }),
     // Configure GraphQL
@@ -93,12 +94,12 @@ import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
   providers: [
     {
       provide: APP_FILTER,
-      useClass: SentryExceptionFilter
-    }
-  ]
+      useClass: SentryExceptionFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SetryLoggerMiddleware).forRoutes("*")
+    consumer.apply(SetryLoggerMiddleware).forRoutes("*");
   }
 }

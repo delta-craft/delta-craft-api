@@ -60,25 +60,11 @@ export class PointsService {
       for (const uc of ucs) {
         const points = data.filter((x) => x.uuid === uc.uid);
 
-        const a = groupBy<IPointPartial>("pointType");
-
-        const pointsCatGroups = a(points);
-
-        for (const pointCatIndex in pointsCatGroups) {
-          const pointCat = pointsCatGroups[pointCatIndex];
-
-          switch (pointCatIndex) {
-            // Mining
-            case "1":
-              break;
-          }
-        }
-
         for (const point of points) {
           const p = new Points();
           p.userId = uc.id;
           p.points = point.points;
-          p.created = new Date(point.created);
+          p.created = point.created ? new Date(point.created) : new Date();
           p.pointType = point.pointType;
           p.description = point.description;
 
@@ -112,11 +98,11 @@ export class PointsService {
   }
 }
 
-const groupBy =
-  <T = any>(key) =>
-  (array: T[]): { [pointType: string]: T[] } =>
-    array.reduce((objectsByKeyValue, obj) => {
-      const value = obj[key];
-      objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
-      return objectsByKeyValue;
-    }, {});
+// const groupBy =
+//   <T = any>(key) =>
+//   (array: T[]): { [pointType: string]: T[] } =>
+//     array.reduce((objectsByKeyValue, obj) => {
+//       const value = obj[key];
+//       objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+//       return objectsByKeyValue;
+//     }, {});
