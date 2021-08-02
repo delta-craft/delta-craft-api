@@ -28,7 +28,7 @@ export class Points {
   @Column("varchar", { name: "description", nullable: true, length: 250 })
   description: string | null;
 
-  @Column("datetime", { name: "created" })
+  @Column("datetime", { name: "created", default: () => "'curtime()'" })
   created: Date;
 
   @OneToMany(() => PointTags, (pointTags) => pointTags.point)
