@@ -2,12 +2,16 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { Request, Response } from 'express';
 import { PluginApiError } from 'src/types/ApiResponse';
+import { ApiException } from 'src/types/exceptions/api.exception';
 
 @Catch()
 export class SentryExceptionFilter<T> implements ExceptionFilter {
   public constructor(@InjectSentry() private readonly client: SentryService) { }
 
   catch(exception: T, host: ArgumentsHost) {
+    if (exception instanceof ApiException) {
+      return
+    }
 
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -39,7 +43,7 @@ export class SentryExceptionFilter<T> implements ExceptionFilter {
   private writeResponse(response: Response, status: HttpStatus) {
     response.status(status).json({
       error: PluginApiError.Unknown,
-      content: null,
+      content: false,
       message: "Error",
       statusCode: status,
       timestamp: new Date().toISOString()

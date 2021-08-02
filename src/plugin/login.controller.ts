@@ -16,11 +16,11 @@ import { LoginData } from "src/types/ILogin";
 import { mockNick, mockUuid } from "src/utils/mockdata";
 import { LoginService } from "./login.service";
 
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 @ApiTags("login")
 @Controller("login")
 export class LoginController {
-  constructor(private readonly loginService: LoginService) {}
+  constructor(private readonly loginService: LoginService) { }
 
   @Post()
   @HttpCode(200)
@@ -35,10 +35,6 @@ export class LoginController {
     @Query("nick") nick: string,
     @Query("uuid") uuid: string,
   ): Promise<IApiPluginResponse<boolean>> {
-    throw new ApiException<IApiPluginResponse<boolean>>(
-      { content: false, message: "Lolotest" },
-      HttpStatus.BAD_REQUEST,
-    );
     return await this.loginService.validatePlayerJoin(uuid, nick);
   }
 
