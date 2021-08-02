@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Post,
   Query,
   UseGuards,
@@ -10,11 +11,12 @@ import {
 import { ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
+import { ApiException } from "src/types/exceptions/api.exception";
 import { LoginData } from "src/types/ILogin";
 import { mockNick, mockUuid } from "src/utils/mockdata";
 import { LoginService } from "./login.service";
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @ApiTags("login")
 @Controller("login")
 export class LoginController {
@@ -33,6 +35,10 @@ export class LoginController {
     @Query("nick") nick: string,
     @Query("uuid") uuid: string,
   ): Promise<IApiPluginResponse<boolean>> {
+    throw new ApiException<IApiPluginResponse<boolean>>(
+      { content: false, message: "Lolotest" },
+      HttpStatus.BAD_REQUEST,
+    );
     return await this.loginService.validatePlayerJoin(uuid, nick);
   }
 
