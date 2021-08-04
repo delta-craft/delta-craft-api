@@ -30,6 +30,7 @@ import { APP_FILTER } from "@nestjs/core";
 import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { TwitterModule } from "./bot/twitter/twitter.module";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { TwitterModule } from "./bot/twitter/twitter.module";
       release: null,
       logLevel: LogLevel.Debug,
     }),
+    ScheduleModule.forRoot(),
     TwitterModule,
   ],
   providers: [
