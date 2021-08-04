@@ -29,6 +29,7 @@ import { LogLevel } from "@sentry/types";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
+import { TwitterModule } from "./bot/twitter/twitter.module";
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
       release: null,
       logLevel: LogLevel.Debug,
     }),
+    TwitterModule,
   ],
   providers: [
     {
