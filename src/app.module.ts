@@ -31,6 +31,7 @@ import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { TwitterModule } from "./bot/twitter/twitter.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { Images } from "./db/entities/Images";
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { ScheduleModule } from "@nestjs/schedule";
         PollVotes,
         ServerLogins,
         DiscordsrvAccounts,
+        Images,
       ],
       synchronize: false,
       timezone: "Z",
