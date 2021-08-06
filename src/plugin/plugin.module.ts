@@ -19,6 +19,8 @@ import { FcmTokens } from "src/db/entities/FcmTokens";
 import { ServerLogins } from "src/db/entities/ServerLogins";
 import { Consents } from "src/db/entities/Consents";
 import { BotModule } from "src/bot/bot.module";
+import { PubSubModule } from "src/pubsub/pubsub.module";
+import { PubSubService } from "src/pubsub/pubsub.service";
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { BotModule } from "src/bot/bot.module";
       Consents,
     ]),
     BotModule,
+    PubSubModule,
   ],
   controllers: [
     PointsController,

@@ -1,9 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { PubSub } from "apollo-server-express";
+import { PUB_SUB } from "src/app.module";
 import { BotNotificationService } from "src/bot/notification.service";
 import { Points } from "src/db/entities/Points";
 import { PointTags } from "src/db/entities/PointTags";
 import { UserConnections } from "src/db/entities/UserConnections";
+import { PubSubService } from "src/pubsub/pubsub.service";
+
 import {
   IApiPluginResponse,
   PluginApiError,
@@ -24,6 +28,7 @@ export class PointsService {
     private readonly ucRepository: Repository<UserConnections>,
     @Inject(BotNotificationService)
     private readonly botNotifications: BotNotificationService,
+    private readonly pubSubService: PubSubService,
   ) {}
 
   async addPoints(data: IPointPartial[]): Promise<IApiPluginResponse<boolean>> {
@@ -69,6 +74,10 @@ export class PointsService {
           p.description = point.description;
 
           const resPoint = await this.pointsRepository.save(p);
+
+          await this.pubSubService.pubSub.publish("pointAdded", {
+            pointAdded: resPoint,
+          });
 
           if (point.pointTags && point.pointTags.length > 0) {
             for (const pt of point.pointTags) {

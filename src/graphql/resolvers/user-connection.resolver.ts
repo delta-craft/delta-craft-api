@@ -1,8 +1,19 @@
-import { Resolver, Query, ResolveField, Parent, Args } from "@nestjs/graphql";
+import { Inject } from "@nestjs/common";
+import {
+  Resolver,
+  Query,
+  ResolveField,
+  Parent,
+  Args,
+  Subscription,
+} from "@nestjs/graphql";
 import { InjectRepository } from "@nestjs/typeorm";
+import { PubSub } from "apollo-server-express";
+import { PUB_SUB } from "src/app.module";
 import { Points } from "src/db/entities/Points";
 import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
+import { PubSubService } from "src/pubsub/pubsub.service";
 import { IPointSummaryWrapper } from "src/types/types";
 import { calcPlayerSummary } from "src/utils/summary";
 import { Repository } from "typeorm";
@@ -16,6 +27,7 @@ export class UserConnectionResolver {
     private readonly teamRepository: Repository<Teams>,
     @InjectRepository(Points)
     private readonly pointsRepository: Repository<Points>,
+    private readonly pubSubService: PubSubService,
   ) {}
 
   @Query("players")
@@ -54,5 +66,17 @@ export class UserConnectionResolver {
 
     const res = calcPlayerSummary(u);
     return res;
+  }
+
+  @Subscription("pointAdded", {
+    resolve: (payload) => {
+      return payload.pointAdded;
+    },
+    filter(this: UserConnectionResolver, payload, variables) {
+      return payload.pointAdded.userId.toString() === variables.userId;
+    },
+  })
+  async pointAdded() {
+    return this.pubSubService.pubSub.asyncIterator("pointAdded");
   }
 }

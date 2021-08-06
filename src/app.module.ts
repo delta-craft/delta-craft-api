@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { Global, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Consents } from "./db/entities/Consents";
@@ -30,6 +30,9 @@ import { APP_FILTER } from "@nestjs/core";
 import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { Images } from "./db/entities/Images";
+import { PubSub } from "apollo-server-express";
+
+export const PUB_SUB = "PUB_SUB";
 
 @Module({
   imports: [
@@ -78,11 +81,9 @@ import { Images } from "./db/entities/Images";
     // Configure GraphQL
     GraphQLModule.forRoot({
       debug: false,
+      installSubscriptionHandlers: true,
       typePaths: ["./**/*.graphql"],
-      // definitions: {
-      //   path: join(process.cwd(), "src/graphql/graphql.ts"),
-      // },
-      // playground: true,
+      introspection: true,
       plugins: [],
     }),
     SentryModule.forRoot({
@@ -98,7 +99,12 @@ import { Images } from "./db/entities/Images";
       provide: APP_FILTER,
       useClass: SentryExceptionFilter,
     },
+    {
+      provide: PUB_SUB,
+      useValue: new PubSub(),
+    },
   ],
+  exports: [PUB_SUB],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

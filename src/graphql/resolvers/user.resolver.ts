@@ -1,4 +1,4 @@
-import { UseGuards } from "@nestjs/common";
+import { Inject, UseGuards } from "@nestjs/common";
 import {
   Args,
   Mutation,
@@ -6,6 +6,7 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from "@nestjs/graphql";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NextauthUsers } from "src/db/entities/NextauthUsers";
