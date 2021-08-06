@@ -29,6 +29,7 @@ import { LogLevel } from "@sentry/types";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
+import { Images } from "./db/entities/Images";
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
         PollVotes,
         ServerLogins,
         DiscordsrvAccounts,
+        Images,
       ],
       synchronize: false,
       timezone: "Z",
