@@ -299,18 +299,20 @@ export class EmbedService {
     y: string,
     z: string,
   ): Promise<StreamableFile> {
-    const file = await getScreenshotUrl(
-      `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
-      true,
-      1920,
-      1080,
-    );
+    try {
+      const file = await getScreenshotUrl(
+        `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
+        true,
+        1920,
+        1080,
+      );
 
-    if (!file) {
+      return new StreamableFile(file);
+    } catch (err) {
+      console.log(err)
       return this.asFile(null);
     }
 
-    return new StreamableFile(file);
   }
 
   private asFile(arrayBuffer: ArrayBuffer): StreamableFile | null {
