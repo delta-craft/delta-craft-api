@@ -84,6 +84,10 @@ export class EmbedService {
 
     const file = await generateHomeCard(nick, teamColour);
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     return new StreamableFile(file);
   }
 
@@ -118,6 +122,11 @@ export class EmbedService {
       summary,
       ratios,
     );
+
+
+    if (!file) {
+      return this.asFile(null);
+    }
 
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
@@ -200,6 +209,10 @@ export class EmbedService {
       },
     );
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
 
@@ -251,6 +264,10 @@ export class EmbedService {
 
     const file = await getTeamCard(team);
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
 
@@ -282,14 +299,20 @@ export class EmbedService {
     y: string,
     z: string,
   ): Promise<StreamableFile> {
-    const file = await getScreenshotUrl(
-      `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
-      true,
-      1920,
-      1080,
-    );
+    try {
+      const file = await getScreenshotUrl(
+        `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
+        true,
+        1920,
+        1080,
+      );
 
-    return new StreamableFile(file);
+      return new StreamableFile(file);
+    } catch (err) {
+      console.log(err)
+      return this.asFile(null);
+    }
+
   }
 
   private asFile(arrayBuffer: ArrayBuffer): StreamableFile | null {
