@@ -84,6 +84,10 @@ export class EmbedService {
 
     const file = await generateHomeCard(nick, teamColour);
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     return new StreamableFile(file);
   }
 
@@ -118,6 +122,11 @@ export class EmbedService {
       summary,
       ratios,
     );
+
+
+    if (!file) {
+      return this.asFile(null);
+    }
 
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
@@ -200,6 +209,10 @@ export class EmbedService {
       },
     );
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
 
@@ -251,6 +264,10 @@ export class EmbedService {
 
     const file = await getTeamCard(team);
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
 
@@ -288,6 +305,10 @@ export class EmbedService {
       1920,
       1080,
     );
+
+    if (!file) {
+      return this.asFile(null);
+    }
 
     return new StreamableFile(file);
   }
