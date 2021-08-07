@@ -1,5 +1,5 @@
 import axios from "axios";
-import moment from "moment";
+import * as moment from "moment";
 
 interface IToCoMiVraci {
   multicast_id: number;
