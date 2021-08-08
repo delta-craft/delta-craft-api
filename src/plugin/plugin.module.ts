@@ -23,6 +23,8 @@ import { PubSubModule } from "src/pubsub/pubsub.module";
 import { PubSubService } from "src/pubsub/pubsub.service";
 import { APP_FILTER } from "@nestjs/core";
 import { ApiExceptionFilter } from "src/utils/api-exception.filter";
+import { StatsService } from "./stats.service";
+import { StatsController } from "./stats.controller";
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { ApiExceptionFilter } from "src/utils/api-exception.filter";
     TeamController,
     SessionController,
     LoginController,
+    StatsController,
   ],
   providers: [
     PointsService,
@@ -52,6 +55,7 @@ import { ApiExceptionFilter } from "src/utils/api-exception.filter";
     TeamService,
     SessionService,
     LoginService,
+    StatsService,
     {
       provide: APP_FILTER,
       useClass: ApiExceptionFilter,
