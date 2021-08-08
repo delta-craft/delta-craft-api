@@ -1,8 +1,11 @@
 import { Injectable, StreamableFile } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import axios from "axios";
+import { Images } from "src/db/entities/Images";
 import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
+import { minutesBetween } from "src/utils/checks";
+import { ImgurService } from "src/utils/imgur.service";
 import { calcPlayerSummary } from "src/utils/summary";
 import { Repository } from "typeorm";
 import { getScreenshotUrl } from "./embed/get-screenshot";
@@ -11,6 +14,12 @@ import { generatePlayerComparisonCard } from "./embed/player-comparison-card";
 import { generateHomeCard } from "./embed/player-home";
 import { getTeamCard } from "./embed/team-card";
 
+enum EmbedEndpoints {
+  PLAYER_COMPARISON = "player-comparison",
+  PLAYER_CARD = "player-card",
+  TEAM_CARD = "team-card",
+}
+
 @Injectable()
 export class EmbedService {
   constructor(
@@ -18,6 +27,9 @@ export class EmbedService {
     private readonly uConnRepository: Repository<UserConnections>,
     @InjectRepository(Teams)
     private readonly teamsRepository: Repository<Teams>,
+    @InjectRepository(Images)
+    private readonly imagesRepository: Repository<Images>,
+    private readonly imgurService: ImgurService,
   ) {}
 
   async generatePlayerHead(uuid: string): Promise<StreamableFile | null> {
@@ -72,10 +84,24 @@ export class EmbedService {
 
     const file = await generateHomeCard(nick, teamColour);
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
     return new StreamableFile(file);
   }
 
   async generatePlayerCard(nick: string): Promise<StreamableFile> {
+    const cached = await this.imagesRepository.findOne({
+      where: {
+        requestUrl: `${EmbedEndpoints.PLAYER_CARD}/${nick}`,
+      },
+    });
+
+    if (cached && minutesBetween(cached.updated, new Date()) < 60) {
+      return await this.imageFromUrl(cached.url);
+    }
+
     const uc = await this.uConnRepository.findOne({
       where: { name: nick },
       relations: ["points", "points.pointTags", "team"],
@@ -97,6 +123,33 @@ export class EmbedService {
       ratios,
     );
 
+
+    if (!file) {
+      return this.asFile(null);
+    }
+
+    const base64 = file.toString("base64");
+    const resultImgur = await this.imgurService.uploadImage(base64);
+
+    if (resultImgur) {
+      if (cached) {
+        await this.imgurService.deleteImage(cached.deletehash);
+        cached.url = resultImgur.link;
+        cached.updated = new Date();
+        cached.imgurId = resultImgur.id;
+        cached.deletehash = resultImgur.deletehash;
+        await this.imagesRepository.save(cached);
+      } else {
+        await this.imagesRepository.save({
+          url: resultImgur.link,
+          updated: new Date(),
+          deletehash: resultImgur.deletehash,
+          imgurId: resultImgur.id,
+          requestUrl: `${EmbedEndpoints.PLAYER_CARD}/${nick}`,
+        });
+      }
+    }
+
     return new StreamableFile(file);
   }
 
@@ -104,6 +157,21 @@ export class EmbedService {
     nick1: string,
     nick2: string,
   ): Promise<StreamableFile> {
+    const cached = await this.imagesRepository.findOne({
+      where: [
+        {
+          requestUrl: `${EmbedEndpoints.PLAYER_COMPARISON}/${nick1}/${nick2}`,
+        },
+        {
+          requestUrl: `${EmbedEndpoints.PLAYER_COMPARISON}/${nick2}/${nick1}`,
+        },
+      ],
+    });
+
+    if (cached && minutesBetween(cached.updated, new Date()) < 60) {
+      return await this.imageFromUrl(cached.url);
+    }
+
     const uc1 = await this.uConnRepository.findOne({
       where: { name: nick1 },
       relations: ["points", "points.pointTags", "team"],
@@ -141,10 +209,46 @@ export class EmbedService {
       },
     );
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
+    const base64 = file.toString("base64");
+    const resultImgur = await this.imgurService.uploadImage(base64);
+
+    if (resultImgur) {
+      if (cached) {
+        await this.imgurService.deleteImage(cached.deletehash);
+        cached.url = resultImgur.link;
+        cached.updated = new Date();
+        cached.imgurId = resultImgur.id;
+        cached.deletehash = resultImgur.deletehash;
+        await this.imagesRepository.save(cached);
+      } else {
+        await this.imagesRepository.save({
+          url: resultImgur.link,
+          updated: new Date(),
+          deletehash: resultImgur.deletehash,
+          imgurId: resultImgur.id,
+          requestUrl: `${EmbedEndpoints.PLAYER_COMPARISON}/${nick1}/${nick2}`,
+        });
+      }
+    }
+
     return new StreamableFile(file);
   }
 
   async generateTeamCard(id: string): Promise<StreamableFile> {
+    const cached = await this.imagesRepository.findOne({
+      where: {
+        requestUrl: `${EmbedEndpoints.TEAM_CARD}/${id}`,
+      },
+    });
+
+    if (cached && minutesBetween(cached.updated, new Date()) < 60) {
+      return await this.imageFromUrl(cached.url);
+    }
+
     const team = await this.teamsRepository.findOne({
       where: { id },
       relations: [
@@ -160,6 +264,32 @@ export class EmbedService {
 
     const file = await getTeamCard(team);
 
+    if (!file) {
+      return this.asFile(null);
+    }
+
+    const base64 = file.toString("base64");
+    const resultImgur = await this.imgurService.uploadImage(base64);
+
+    if (resultImgur) {
+      if (cached) {
+        await this.imgurService.deleteImage(cached.deletehash);
+        cached.url = resultImgur.link;
+        cached.updated = new Date();
+        cached.imgurId = resultImgur.id;
+        cached.deletehash = resultImgur.deletehash;
+        await this.imagesRepository.save(cached);
+      } else {
+        await this.imagesRepository.save({
+          url: resultImgur.link,
+          updated: new Date(),
+          deletehash: resultImgur.deletehash,
+          imgurId: resultImgur.id,
+          requestUrl: `${EmbedEndpoints.TEAM_CARD}/${id}`,
+        });
+      }
+    }
+
     return new StreamableFile(file);
   }
 
@@ -169,14 +299,20 @@ export class EmbedService {
     y: string,
     z: string,
   ): Promise<StreamableFile> {
-    const file = await getScreenshotUrl(
-      `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
-      true,
-      1920,
-      1080,
-    );
+    try {
+      const file = await getScreenshotUrl(
+        `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
+        true,
+        1920,
+        1080,
+      );
 
-    return new StreamableFile(file);
+      return new StreamableFile(file);
+    } catch (err) {
+      console.log(err)
+      return this.asFile(null);
+    }
+
   }
 
   private asFile(arrayBuffer: ArrayBuffer): StreamableFile | null {
@@ -185,5 +321,17 @@ export class EmbedService {
     }
     const buffer = Buffer.from(arrayBuffer);
     return new StreamableFile(buffer);
+  }
+
+  private async imageFromUrl(url: string): Promise<StreamableFile> {
+    const img = await axios.get<ArrayBuffer>(url, {
+      responseType: "arraybuffer",
+    });
+
+    if (img.status !== 200) {
+      return null;
+    }
+
+    return this.asFile(img.data);
   }
 }

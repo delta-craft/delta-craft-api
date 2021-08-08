@@ -62,8 +62,6 @@ export class SessionService {
       where: { connectionId: uConn.id },
     });
 
-    console.log(session);
-
     if (!session) {
       return {
         content: { success: false },

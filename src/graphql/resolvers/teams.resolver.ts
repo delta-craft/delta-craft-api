@@ -74,7 +74,6 @@ export class TeamResolver {
     red: IPointSummaryWrapper;
   }> {
     const teams = await this.teamRepository.find({
-      where: { majorTeam: "blue" },
       relations: ["userConnections", "userConnections.points"],
     });
 

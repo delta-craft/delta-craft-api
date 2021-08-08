@@ -20,6 +20,8 @@ import { PollOptions } from "src/db/entities/PollOptions";
 import { Polls } from "src/db/entities/Polls";
 import { PollVotes } from "src/db/entities/PollVotes";
 import { ConsentsResolver } from "./resolvers/consents.resolver";
+import { PubSubModule } from "src/pubsub/pubsub.module";
+import { PubSubService } from "src/pubsub/pubsub.service";
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { ConsentsResolver } from "./resolvers/consents.resolver";
       Polls,
       PollOptions,
     ]),
+    PubSubModule,
   ],
   providers: [
     UserConnectionResolver,

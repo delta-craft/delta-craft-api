@@ -5,23 +5,30 @@ import { calcTeamSummary } from "src/utils/summary";
 import { getScreenshot } from "./get-screenshot";
 
 export const getTeamCard = async (team: Teams): Promise<Buffer> => {
-  const { summary, ratios } = calcTeamSummary(team);
-  const html = getTeamCardHtml(team, summary, ratios);
-  const file = await getScreenshot(html, true);
-  return file;
+    const { summary, ratios } = calcTeamSummary(team);
+    const html = getTeamCardHtml(team, summary, ratios);
+    try {
+        const file = await getScreenshot(html, true);
+
+        return file;
+    } catch (err) {
+        console.log(err);
+        //res.status(405).json({ error: err });
+        return null;
+    }
 };
 
 const getCss = (theme: string, fontSize: string) => {
-  let background = "white";
-  let foreground = "black";
-  let radial = "lightgray";
+    let background = "white";
+    let foreground = "black";
+    let radial = "lightgray";
 
-  if (theme === "dark") {
-    background = "black";
-    foreground = "white";
-    radial = "dimgray";
-  }
-  return `
+    if (theme === "dark") {
+        background = "black";
+        foreground = "white";
+        radial = "dimgray";
+    }
+    return `
 
     body {
         background-image: url('https://portal.deltacraft.eu/img/banner.jpg');
@@ -221,27 +228,27 @@ const getCss = (theme: string, fontSize: string) => {
 };
 
 const getTeamCardHtml = (
-  team: Teams,
-  summary: IPointSummary,
-  ratios: IPointSummary,
+    team: Teams,
+    summary: IPointSummary,
+    ratios: IPointSummary,
 ) => {
-  const { name, userConnections, majorTeam } = team;
+    const { name, userConnections, majorTeam } = team;
 
-  const icon =
-    majorTeam === "red"
-      ? emojify("🔴")
-      : majorTeam === "blue"
-      ? emojify("🔵")
-      : "";
+    const icon =
+        majorTeam === "red"
+            ? emojify("🔴")
+            : majorTeam === "blue"
+                ? emojify("🔵")
+                : "";
 
-  const players = userConnections
-    .map(
-      (x, i) =>
-        `<img src="https://minotar.net/helm/${x.name}/324" alt="..." class="player-img" />`,
-    )
-    .join("\r\n");
+    const players = userConnections
+        .map(
+            (x, i) =>
+                `<img src="https://minotar.net/helm/${x.name}/324" alt="..." class="player-img" />`,
+        )
+        .join("\r\n");
 
-  return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html>
     <meta charset="utf-8">
     <title>Generated Image</title>

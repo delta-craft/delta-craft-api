@@ -110,6 +110,10 @@ type PollVotes {
   connection: UserConnections
 }
 
+type Subscription {
+  pointAdded(userId: ID!): Point
+}
+
 type Query {
   userConnections: [UserConnections]
   user: User

@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as moment from "moment";
 
 interface IToCoMiVraci {
   multicast_id: number;
@@ -9,6 +10,8 @@ interface IToCoMiVraci {
 }
 
 export const newLoginNotification = async (tokens: string[]) => {
+  const expTimestamp = moment(new Date()).add(5, "m").unix();
+
   for (const token of tokens) {
     const notification = {
       to: token,
@@ -17,9 +20,20 @@ export const newLoginNotification = async (tokens: string[]) => {
         body: "Potvrďte žádost v portalu",
         type: "login-request",
       },
+      apns: {
+        headers: {
+          "apns-expiration": expTimestamp.toString(),
+        },
+      },
+      android: {
+        ttl: "300s",
+      },
       webpush: {
         fcm_options: {
           link: "/login",
+        },
+        headers: {
+          TTL: "300",
         },
       },
     };
