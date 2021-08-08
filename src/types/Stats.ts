@@ -1,3 +1,5 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export interface IStatsResponse {
   success: boolean;
   player: string;
@@ -38,4 +40,35 @@ interface INameStats extends IBaseStats {
 
 interface IBaseStats {
   count: number;
+}
+
+class MaterialStats implements IMaterialStats {
+  @ApiProperty()
+  material: string;
+  @ApiProperty()
+  count: number;
+}
+
+class TotalStats implements ITotalMiningStats {
+  @ApiProperty({ type: [MaterialStats] })
+  data: MaterialStats[];
+  @ApiProperty()
+  totalPoints: number;
+}
+
+class Stats implements IStats {
+  @ApiProperty()
+  mining: TotalStats;
+  @ApiProperty()
+  crafting: TotalStats;
+}
+export class StatsResponse implements IStatsResponse {
+  @ApiProperty()
+  success: boolean;
+
+  @ApiProperty()
+  player: string;
+
+  @ApiProperty()
+  stats?: Stats;
 }
