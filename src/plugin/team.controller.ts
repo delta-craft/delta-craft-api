@@ -3,13 +3,13 @@ import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
 import { BoolApiResponse, IApiPluginResponse } from "src/types/ApiResponse";
 import { mockUuid } from "src/utils/mockdata";
-import { ChatService } from "./chat.service";
+import { TeamService } from "./team.service";
 
 @UseGuards(AuthGuard)
 @ApiTags("team")
 @Controller("team")
 export class TeamController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly teamService: TeamService) {}
 
   @Get("is-owner")
   @ApiQuery({ name: "uuid", example: mockUuid })
@@ -19,6 +19,6 @@ export class TeamController {
   async isOwner(
     @Query("uuid") uuid: string,
   ): Promise<IApiPluginResponse<boolean>> {
-    return await this.chatService.checkMessage(uuid);
+    return await this.teamService.isTeamOwner(uuid);
   }
 }
