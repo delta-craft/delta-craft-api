@@ -8,9 +8,11 @@ import { PluginApiException } from "src/types/exceptions/api.exception";
 import {
   ICraftingStats,
   IMiningStats,
+  IMobsStats,
   IStatsResponse,
   ITotalCraftingStats,
   ITotalMiningStats,
+  ITotalMobStats,
 } from "src/types/Stats";
 import { Repository } from "typeorm";
 
@@ -36,16 +38,13 @@ export class StatsService {
     }
 
     const points = await this.pointsRepository.find({
-      where: [
-        { userId: uc.id, pointType: PointType.Mining },
-        { userId: uc.id, pointType: PointType.Crafting },
-      ],
+      where: { userId: uc.id },
       relations: ["pointTags"],
     });
 
-    const groups = groupBy(points, (x) => x.pointType);
+    const groups = groupBy(points ?? [], (x) => x.pointType);
 
-    const miningPoints = groups[PointType.Mining];
+    const miningPoints = groups[PointType.Mining] ?? [];
 
     let total = 0;
 
@@ -80,7 +79,7 @@ export class StatsService {
       data: totalMining,
     };
 
-    const craftingPoints = groups[PointType.Crafting];
+    const craftingPoints = groups[PointType.Crafting] ?? [];
 
     total = 0;
 
@@ -117,8 +116,39 @@ export class StatsService {
       data: totalMining,
     };
 
-    const jurneyPoints = groups[PointType.Journey];
-    const warfarePoints = groups[PointType.Warfare];
+    const mobPoints = groups[PointType.Warfare] ?? [];
+
+    total = 0;
+
+    const mobMap = new Map<string, number>();
+
+    for (const point of mobPoints) {
+      total += point.points;
+
+      const tags = point.pointTags;
+      if (!tags) continue;
+      const entityTag = tags.find((x) => x.key == "Entity");
+      if (!entityTag) continue;
+      const entity = entityTag.value;
+      if (!mobMap.has(entity)) {
+        mobMap.set(entity, 0);
+      }
+      const original = mobMap.get(entity);
+      mobMap.set(entity, original + 1);
+    }
+
+    const totalMob: IMobsStats[] = [];
+    mobMap.forEach((count, entity) =>
+      totalMob.push({
+        entity: entity,
+        count: count,
+      }),
+    );
+
+    const totalMobStats: ITotalMobStats = {
+      totalPoints: total,
+      data: totalMob,
+    };
 
     const res: IStatsResponse = {
       success: true,
@@ -126,6 +156,7 @@ export class StatsService {
       stats: {
         mining: totalMiningStats,
         crafting: totalCraftingStats,
+        mob: totalMobStats,
       },
     };
 

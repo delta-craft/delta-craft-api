@@ -9,17 +9,16 @@ export interface IStatsResponse {
 interface IStats {
   mining: ITotalMiningStats;
   crafting: ITotalCraftingStats;
+  mob: ITotalMobStats;
 }
 
 export interface ITotalMiningStats extends ITotalStats<IMiningStats> {}
 export interface ITotalCraftingStats extends ITotalStats<ICraftingStats> {}
-export interface ITotalWarfareStats extends ITotalStats<IWarfareStats> {}
-export interface ITotalJurneyStats extends ITotalStats<IJurenyStats> {}
+export interface ITotalMobStats extends ITotalStats<IMobsStats> {}
 
 export interface IMiningStats extends IMaterialStats {}
 export interface ICraftingStats extends IMaterialStats {}
-export interface IWarfareStats extends IEntityStats {}
-export interface IJurenyStats extends INameStats {}
+export interface IMobsStats extends IEntityStats {}
 
 interface ITotalStats<T extends IBaseStats> {
   data: T[];
@@ -34,10 +33,6 @@ interface IEntityStats extends IBaseStats {
   entity: string;
 }
 
-interface INameStats extends IBaseStats {
-  name: string;
-}
-
 interface IBaseStats {
   count: number;
 }
@@ -49,7 +44,21 @@ class MaterialStats implements IMaterialStats {
   count: number;
 }
 
-class TotalStats implements ITotalMiningStats {
+class MobStats implements IEntityStats {
+  @ApiProperty()
+  entity: string;
+  @ApiProperty()
+  count: number;
+}
+
+class TotalMobStats implements ITotalStats<MobStats> {
+  @ApiProperty({ type: [MobStats] })
+  data: MobStats[];
+  @ApiProperty()
+  totalPoints: number;
+}
+
+class TotalMaterialStats implements ITotalStats<MaterialStats> {
   @ApiProperty({ type: [MaterialStats] })
   data: MaterialStats[];
   @ApiProperty()
@@ -58,9 +67,11 @@ class TotalStats implements ITotalMiningStats {
 
 class Stats implements IStats {
   @ApiProperty()
-  mining: TotalStats;
+  mining: TotalMaterialStats;
   @ApiProperty()
-  crafting: TotalStats;
+  crafting: TotalMaterialStats;
+  @ApiProperty()
+  mob: TotalMobStats;
 }
 export class StatsResponse implements IStatsResponse {
   @ApiProperty()
