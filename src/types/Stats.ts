@@ -1,4 +1,3 @@
-import { PointType } from "./enums";
 export interface IStatsResponse {
   success: boolean;
   player: string;
@@ -6,10 +5,8 @@ export interface IStatsResponse {
 }
 
 interface IStats {
-  [PointType.Mining]: ITotalMiningStats;
-  [PointType.Crafting]: ITotalCraftingStats;
-  /* [PointType.Warfare]: ITotalWarfareStats;
-  [PointType.Journey]: ITotalJurneyStats;*/
+  mining: ITotalMiningStats;
+  crafting: ITotalCraftingStats;
 }
 
 export interface ITotalMiningStats extends ITotalStats<IMiningStats> {}

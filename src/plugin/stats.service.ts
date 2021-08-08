@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Points } from "src/db/entities/Points";
-import { PointTags } from "src/db/entities/PointTags";
-import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
 import { IApiPluginResponse, PointsError } from "src/types/ApiResponse";
 import { PointType } from "src/types/enums";
@@ -38,7 +36,10 @@ export class StatsService {
     }
 
     const points = await this.pointsRepository.find({
-      where: { userId: uc.id },
+      where: [
+        { userId: uc.id, pointType: PointType.Mining },
+        { userId: uc.id, pointType: PointType.Crafting },
+      ],
       relations: ["pointTags"],
     });
 
@@ -123,8 +124,8 @@ export class StatsService {
       success: true,
       player: nick,
       stats: {
-        [PointType.Mining]: totalMiningStats,
-        [PointType.Crafting]: totalCraftingStats,
+        mining: totalMiningStats,
+        crafting: totalCraftingStats,
       },
     };
 
