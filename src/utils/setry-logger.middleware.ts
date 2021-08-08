@@ -3,7 +3,7 @@ import { InjectSentry, SentryService } from "@ntegral/nestjs-sentry";
 import { Request, Response, NextFunction } from "express";
 import { sendToSentry } from "./sentry";
 
-const ignoredStatus = [200, 201, 304, 400, 401, 404];
+const ignoredStatus = [200, 201, 202, 204, 304, 400, 401, 404];
 
 @Injectable()
 export class SetryLoggerMiddleware implements NestMiddleware {
