@@ -1,4 +1,4 @@
-import { Global, MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Consents } from "./db/entities/Consents";
@@ -24,13 +24,12 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { GQLModule } from "./graphql/graphql.module";
 import { BotModule } from "./bot/bot.module";
 import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
-import { SentryModule } from "@ntegral/nestjs-sentry";
+import { GraphqlInterceptor, SentryModule } from "@ntegral/nestjs-sentry";
 import { LogLevel } from "@sentry/types";
-import { APP_FILTER } from "@nestjs/core";
+import { APP_INTERCEPTOR } from "@nestjs/core";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { Images } from "./db/entities/Images";
 import { PubSub } from "apollo-server-express";
-import { ApiExceptionFilter } from "./utils/api-exception.filter";
 
 export const PUB_SUB = "PUB_SUB";
 
@@ -96,8 +95,8 @@ export const PUB_SUB = "PUB_SUB";
   ],
   providers: [
     {
-      provide: APP_FILTER,
-      useClass: ApiExceptionFilter,
+      provide: APP_INTERCEPTOR,
+      useClass: GraphqlInterceptor,
     },
     {
       provide: PUB_SUB,

@@ -21,6 +21,8 @@ import { Consents } from "src/db/entities/Consents";
 import { BotModule } from "src/bot/bot.module";
 import { PubSubModule } from "src/pubsub/pubsub.module";
 import { PubSubService } from "src/pubsub/pubsub.service";
+import { APP_FILTER } from "@nestjs/core";
+import { ApiExceptionFilter } from "src/utils/api-exception.filter";
 
 @Module({
   imports: [
@@ -50,6 +52,10 @@ import { PubSubService } from "src/pubsub/pubsub.service";
     TeamService,
     SessionService,
     LoginService,
+    {
+      provide: APP_FILTER,
+      useClass: ApiExceptionFilter,
+    },
   ],
 })
 export class PluginModule {}
