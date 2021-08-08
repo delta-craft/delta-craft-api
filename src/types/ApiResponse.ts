@@ -1,3 +1,6 @@
+import { ApiProperty } from "@nestjs/swagger";
+import ISessionResponse from "./Sessions";
+
 export enum PluginApiError {
   NotImplemented = "not_implemented",
   Unauthorized = "unauthorized",
@@ -31,5 +34,39 @@ export enum PointsError {
 export interface IApiPluginResponse<T = any> {
   content?: T;
   error?: PluginApiError | ValidateError | PointsError | LoginError;
+  message?: string;
+}
+
+export class BoolApiResponse implements IApiPluginResponse<boolean> {
+  @ApiProperty()
+  content?: boolean;
+  @ApiProperty()
+  error?: PluginApiError | ValidateError | PointsError | LoginError;
+  @ApiProperty()
+  message?: string;
+}
+
+class SessionTeam {
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  majorTeam: string;
+}
+
+class SessionContent implements ISessionResponse {
+  @ApiProperty()
+  success: boolean;
+  @ApiProperty()
+  team?: SessionTeam;
+}
+
+export class SessionApiResponse implements IApiPluginResponse<SessionContent> {
+  @ApiProperty()
+  content?: SessionContent;
+  @ApiProperty()
+  error?: PluginApiError | ValidateError | PointsError | LoginError;
+  @ApiProperty()
   message?: string;
 }

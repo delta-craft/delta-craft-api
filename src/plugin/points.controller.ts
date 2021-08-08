@@ -6,10 +6,10 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBody, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Points } from "src/db/entities/Points";
 import { AuthGuard } from "src/guards/auth.guard";
-import { IApiPluginResponse } from "src/types/ApiResponse";
+import { BoolApiResponse, IApiPluginResponse } from "src/types/ApiResponse";
 import { PointPartial } from "src/types/points/IPointsInput";
 import { PointsService } from "./points.service";
 
@@ -23,6 +23,7 @@ export class PointsController {
   @Post("add")
   @HttpCode(200)
   @HttpCode(400)
+  @ApiResponse({ type: BoolApiResponse })
   async addPoints(
     @Body() data: PointPartial[],
   ): Promise<IApiPluginResponse<boolean>> {

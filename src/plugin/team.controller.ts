@@ -1,7 +1,7 @@
 import { Controller, Get, HttpCode, Query, UseGuards } from "@nestjs/common";
-import { ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
-import { IApiPluginResponse } from "src/types/ApiResponse";
+import { BoolApiResponse, IApiPluginResponse } from "src/types/ApiResponse";
 import { mockUuid } from "src/utils/mockdata";
 import { TeamService } from "./team.service";
 
@@ -15,6 +15,7 @@ export class TeamController {
   @ApiQuery({ name: "uuid", example: mockUuid })
   @HttpCode(200)
   @HttpCode(400)
+  @ApiResponse({ type: BoolApiResponse })
   async isOwner(
     @Query("uuid") uuid: string,
   ): Promise<IApiPluginResponse<boolean>> {

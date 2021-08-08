@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { BotNotificationService } from "src/bot/notification.service";
 import { IApiPluginResponse } from "src/types/ApiResponse";
+import { BoolApiException } from "src/types/exceptions/api.exception";
 import resolveMessage, { Positivity } from "src/utils/wit-client";
 
 @Injectable()
@@ -33,9 +34,9 @@ export class ChatService {
         .map((x) => `${x.body} (${x.value})`)
         .join(", ");
 
-        await this.botNotifications.inappropriateMessage(message);
+      await this.botNotifications.inappropriateMessage(message);
 
-      return { content: false, message: words };
+      throw new BoolApiException({ message: words });
     }
 
     return {

@@ -7,9 +7,13 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
-import { IApiPluginResponse } from "src/types/ApiResponse";
+import {
+  BoolApiResponse,
+  IApiPluginResponse,
+  SessionApiResponse,
+} from "src/types/ApiResponse";
 import { LoginData } from "src/types/ILogin";
 import ISessionResponse from "src/types/Sessions";
 import { mockIp, mockUuid } from "src/utils/mockdata";
@@ -24,6 +28,7 @@ export class SessionController {
   @Get("validate")
   @ApiQuery({ name: "uuid", example: mockUuid })
   @ApiQuery({ name: "ip", example: mockIp })
+  @ApiResponse({ type: SessionApiResponse })
   async validateSession(
     @Query("uuid") uuid: string,
     @Query("ip") ip: string,
@@ -33,6 +38,7 @@ export class SessionController {
 
   @Post("update")
   @HttpCode(200)
+  @ApiResponse({ type: BoolApiResponse })
   async updateSession(
     @Body() params: LoginData,
   ): Promise<IApiPluginResponse<boolean>> {
