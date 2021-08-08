@@ -27,10 +27,10 @@ import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
 import { SentryModule } from "@ntegral/nestjs-sentry";
 import { LogLevel } from "@sentry/types";
 import { APP_FILTER } from "@nestjs/core";
-import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { Images } from "./db/entities/Images";
 import { PubSub } from "apollo-server-express";
+import { ApiExceptionFilter } from "./utils/api-exception.filter";
 
 export const PUB_SUB = "PUB_SUB";
 
@@ -97,7 +97,7 @@ export const PUB_SUB = "PUB_SUB";
   providers: [
     {
       provide: APP_FILTER,
-      useClass: SentryExceptionFilter,
+      useClass: ApiExceptionFilter,
     },
     {
       provide: PUB_SUB,

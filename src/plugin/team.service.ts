@@ -7,6 +7,7 @@ import {
   PluginApiError,
   ValidateError,
 } from "src/types/ApiResponse";
+import { BoolApiException } from "src/types/exceptions/api.exception";
 import { isUuidValid } from "src/utils/checks";
 import { Repository } from "typeorm";
 
@@ -21,29 +22,26 @@ export class TeamService {
 
   async isTeamOwner(uid: string): Promise<IApiPluginResponse<boolean>> {
     if (!isUuidValid(uid)) {
-      return {
-        content: false,
+      throw new BoolApiException({
         message: "Invalid UUID",
         error: PluginApiError.UuidNotValid,
-      };
+      });
     }
 
     const uc = await this.ucRepository.findOne({ where: { uid } });
 
     if (!uc) {
-      return {
-        content: false,
+      throw new BoolApiException({
         message: "User not found",
         error: PluginApiError.Unknown,
-      };
+      });
     }
 
     if (!uc.teamId) {
-      return {
-        content: false,
+      throw new BoolApiException({
         message: "User not in team",
         error: ValidateError.NotInTeam,
-      };
+      });
     }
 
     const team = await this.teamRepository.findOne({

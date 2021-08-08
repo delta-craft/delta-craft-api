@@ -7,9 +7,9 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
-import { IApiPluginResponse } from "src/types/ApiResponse";
+import { BoolApiResponse, IApiPluginResponse } from "src/types/ApiResponse";
 import { LoginData } from "src/types/ILogin";
 import { mockNick, mockUuid } from "src/utils/mockdata";
 import { LoginService } from "./login.service";
@@ -22,6 +22,7 @@ export class LoginController {
 
   @Post()
   @HttpCode(200)
+  @ApiResponse({ type: BoolApiResponse })
   async login(@Body() data: LoginData): Promise<IApiPluginResponse<boolean>> {
     return await this.loginService.newLogin(data);
   }
@@ -29,6 +30,7 @@ export class LoginController {
   @Get("validate")
   @ApiQuery({ name: "nick", example: mockNick })
   @ApiQuery({ name: "uuid", example: mockUuid })
+  @ApiResponse({ type: BoolApiResponse })
   async validate(
     @Query("nick") nick: string,
     @Query("uuid") uuid: string,
@@ -38,6 +40,7 @@ export class LoginController {
 
   @Post("logout")
   @HttpCode(200)
+  @ApiResponse({ type: BoolApiResponse })
   async logout(): Promise<IApiPluginResponse<boolean>> {
     return await this.loginService.logoutAll();
   }
