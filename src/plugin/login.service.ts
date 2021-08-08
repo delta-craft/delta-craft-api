@@ -9,6 +9,7 @@ import {
   PluginApiError,
   ValidateError,
 } from "src/types/ApiResponse";
+import { BoolApiException } from "src/types/exceptions/api.exception";
 import { ILoginData } from "src/types/ILogin";
 import { isIPv4Valid, isUuidValid } from "src/utils/checks";
 import { newLoginNotification } from "src/utils/new-login-notification";
@@ -30,7 +31,7 @@ export class LoginService {
   async newLogin(data: ILoginData): Promise<IApiPluginResponse<boolean>> {
     const { uuid, ip } = data;
     if (!isUuidValid(uuid)) {
-      return { content: false, error: PluginApiError.UuidNotValid };
+      throw new BoolApiException({ error: PluginApiError.UuidNotValid });
     }
 
     if (!ip) {

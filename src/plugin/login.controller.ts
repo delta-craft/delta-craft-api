@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpCode,
-  HttpStatus,
   Post,
   Query,
   UseGuards,
@@ -11,7 +10,6 @@ import {
 import { ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
 import { IApiPluginResponse } from "src/types/ApiResponse";
-import { ApiException } from "src/types/exceptions/api.exception";
 import { LoginData } from "src/types/ILogin";
 import { mockNick, mockUuid } from "src/utils/mockdata";
 import { LoginService } from "./login.service";
@@ -20,7 +18,7 @@ import { LoginService } from "./login.service";
 @ApiTags("login")
 @Controller("login")
 export class LoginController {
-  constructor(private readonly loginService: LoginService) { }
+  constructor(private readonly loginService: LoginService) {}
 
   @Post()
   @HttpCode(200)
