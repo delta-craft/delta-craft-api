@@ -15,7 +15,7 @@ class StatsApiResponse {
   message?: string;
 }
 
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 @ApiTags("stats")
 @Controller("stats")
 export class StatsController {
