@@ -113,7 +113,7 @@ export class StatsService {
 
     const totalCraftingStats: ITotalCraftingStats = {
       totalPoints: total,
-      data: totalMining,
+      data: totalCrafting,
     };
 
     const mobPoints = groups[PointType.Warfare] ?? [];
