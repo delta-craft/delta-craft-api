@@ -145,7 +145,11 @@ export class SessionService {
       };
     }
 
-    const t = { id: team.id, majorTeam: team.majorTeam, name: team.name };
+    const t = {
+      id: team.id,
+      majorTeam: team.majorTeam,
+      name: team.name.trim().replace(" ", "-"),
+    };
 
     return { content: { success: true, team: t }, message: "Hurray" };
   }
