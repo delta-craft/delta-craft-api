@@ -12,7 +12,16 @@ const getBrowser = async () => {
   // const options = await getOptions(isDev);
   // const browser = await core.launch(options);
 
-  const browser = await playwright.chromium.launch({ chromiumSandbox: false });
+  const browser = await playwright.chromium.launch({
+    chromiumSandbox: false,
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--no-first-run",
+    ],
+  });
   return browser;
 };
 
