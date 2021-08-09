@@ -70,6 +70,7 @@ type Team {
   name: String
   teamColourHex: String
   majorTeam: String
+  ownerConnId: ID
   userConnections: [UserConnections]
   pointSummary: PointSummaryWrapper
 }
