@@ -30,11 +30,13 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { Images } from "./db/entities/Images";
 import { PubSub } from "apollo-server-express";
+import { DateModule } from './date/date.module';
 
 export const PUB_SUB = "PUB_SUB";
 
 @Module({
   imports: [
+    DateModule,
     PluginModule,
     EmbedModule,
     GQLModule,
