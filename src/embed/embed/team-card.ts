@@ -5,30 +5,30 @@ import { calcTeamSummary } from "src/utils/summary";
 import { getScreenshot } from "./get-screenshot";
 
 export const getTeamCard = async (team: Teams): Promise<Buffer> => {
-    const { summary, ratios } = calcTeamSummary(team);
-    const html = getTeamCardHtml(team, summary, ratios);
-    try {
-        const file = await getScreenshot(html, true);
+  const { summary, ratios } = calcTeamSummary(team);
+  const html = getTeamCardHtml(team, summary, ratios);
+  try {
+    const file = await getScreenshot(html, true);
 
-        return file;
-    } catch (err) {
-        console.log(err);
-        //res.status(405).json({ error: err });
-        return null;
-    }
+    return file;
+  } catch (err) {
+    console.log(err);
+    //res.status(405).json({ error: err });
+    return null;
+  }
 };
 
 const getCss = (theme: string, fontSize: string) => {
-    let background = "white";
-    let foreground = "black";
-    let radial = "lightgray";
+  let background = "white";
+  let foreground = "black";
+  let radial = "lightgray";
 
-    if (theme === "dark") {
-        background = "black";
-        foreground = "white";
-        radial = "dimgray";
-    }
-    return `
+  if (theme === "dark") {
+    background = "black";
+    foreground = "white";
+    radial = "dimgray";
+  }
+  return `
 
     body {
         background-image: url('https://portal.deltacraft.eu/img/banner.jpg');
@@ -228,27 +228,27 @@ const getCss = (theme: string, fontSize: string) => {
 };
 
 const getTeamCardHtml = (
-    team: Teams,
-    summary: IPointSummary,
-    ratios: IPointSummary,
+  team: Teams,
+  summary: IPointSummary,
+  ratios: IPointSummary,
 ) => {
-    const { name, userConnections, majorTeam } = team;
+  const { name, userConnections, majorTeam } = team;
 
-    const icon =
-        majorTeam === "red"
-            ? emojify("🔴")
-            : majorTeam === "blue"
-                ? emojify("🔵")
-                : "";
+  const icon =
+    majorTeam === "red"
+      ? emojify("🔴")
+      : majorTeam === "blue"
+      ? emojify("🔵")
+      : "";
 
-    const players = userConnections
-        .map(
-            (x, i) =>
-                `<img src="https://minotar.net/helm/${x.name}/324" alt="..." class="player-img" />`,
-        )
-        .join("\r\n");
+  const players = userConnections
+    .map(
+      (x, i) =>
+        `<img src="https://minotar.net/helm/${x.name}/324" alt="..." class="player-img" />`,
+    )
+    .join("\r\n");
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html>
     <meta charset="utf-8">
     <title>Generated Image</title>
@@ -324,4 +324,62 @@ const getTeamCardHtml = (
         </div>
     </body>
 </html>`;
+};
+
+export const generateTeamMarkerImage = async (
+  team: Teams | null,
+): Promise<Buffer> => {
+  try {
+    const html = getTeamMarkerCardHtml(team);
+
+    const file = await getScreenshot(html, true, 32, 32);
+
+    return file;
+  } catch (err) {
+    console.log(err);
+    //res.status(405).json({ error: err });
+    return null;
+  }
+};
+
+const getTeamMarkerCardHtml = (team: Teams | null) => {
+  const content = team
+    ? ' <img src="https://img.icons8.com/material-outlined/32/000000/info.png" />'
+    : ' <img src="https://img.icons8.com/material-outlined/32/000000/info.png" />';
+
+  return `<!DOCTYPE html>
+  <html>
+      <meta charset="utf-8">
+      <title>Generated Image</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+      ${getTeamCss("dark", "52px")}
+      </style>
+      <body>
+         ${content}
+      </body>
+  </html>`;
+};
+
+const getTeamCss = (theme: string, fontSize: string): string => {
+  let background = "white";
+  let foreground = "black";
+  let radial = "lightgray";
+
+  if (theme === "dark") {
+    background = "black";
+    foreground = "white";
+    radial = "dimgray";
+  }
+  return `
+  
+      body {
+          background: none;
+          height: 100vh;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+      }
+  
+    `;
 };

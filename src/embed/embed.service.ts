@@ -12,7 +12,7 @@ import { getScreenshotUrl } from "./embed/get-screenshot";
 import { generatePlayerCard } from "./embed/player-card";
 import { generatePlayerComparisonCard } from "./embed/player-comparison-card";
 import { generateHomeCard } from "./embed/player-home";
-import { getTeamCard } from "./embed/team-card";
+import { generateTeamMarkerImage, getTeamCard } from "./embed/team-card";
 
 enum EmbedEndpoints {
   PLAYER_COMPARISON = "player-comparison",
@@ -20,6 +20,7 @@ enum EmbedEndpoints {
   TEAM_CARD = "team-card",
   PLAYER_HEAD = "player-head",
   PLAYER_HOME = "player-home",
+  TEAM_MARKER = "team-marker",
 }
 
 @Injectable()
@@ -376,6 +377,52 @@ export class EmbedService {
           deletehash: resultImgur.deletehash,
           imgurId: resultImgur.id,
           requestUrl: `${EmbedEndpoints.TEAM_CARD}/${id}`,
+        });
+      }
+    }
+
+    return new StreamableFile(file);
+  }
+
+  async generateTeamMarker(id: string): Promise<StreamableFile> {
+    const cached = await this.imagesRepository.findOne({
+      where: {
+        requestUrl: `${EmbedEndpoints.TEAM_MARKER}/${id}`,
+      },
+    });
+
+    if (cached && minutesBetween(cached.updated, new Date()) < 180) {
+      return await this.imageFromUrl(cached.url);
+    }
+
+    const team = await this.teamsRepository.findOne({
+      where: { id: id },
+    });
+
+    const file = await generateTeamMarkerImage(team);
+
+    if (!file) {
+      return this.asFile(null);
+    }
+
+    const base64 = file.toString("base64");
+    const resultImgur = await this.imgurService.uploadImage(base64);
+
+    if (resultImgur) {
+      if (cached) {
+        await this.imgurService.deleteImage(cached.deletehash);
+        cached.url = resultImgur.link;
+        cached.updated = new Date();
+        cached.imgurId = resultImgur.id;
+        cached.deletehash = resultImgur.deletehash;
+        await this.imagesRepository.save(cached);
+      } else {
+        await this.imagesRepository.save({
+          url: resultImgur.link,
+          updated: new Date(),
+          deletehash: resultImgur.deletehash,
+          imgurId: resultImgur.id,
+          requestUrl: `${EmbedEndpoints.TEAM_MARKER}/${id}`,
         });
       }
     }
