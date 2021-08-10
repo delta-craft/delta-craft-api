@@ -394,7 +394,7 @@ export class EmbedService {
     if (team.majorTeam === "blue") img += "blue";
     else img += "red";
 
-    return this.imageFromUrl(`https://cdn.deltacraft.eu/icons/${img}.svg`);
+    return await this.imageFromUrl(`https://cdn.deltacraft.eu/icons/${img}.svg`);
   }
 
   async generateDynmapImage(
