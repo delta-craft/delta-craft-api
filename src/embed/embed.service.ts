@@ -385,49 +385,16 @@ export class EmbedService {
   }
 
   async generateTeamMarker(id: string): Promise<StreamableFile> {
-    const cached = await this.imagesRepository.findOne({
-      where: {
-        requestUrl: `${EmbedEndpoints.TEAM_MARKER}/${id}`,
-      },
-    });
-
-    if (cached && minutesBetween(cached.updated, new Date()) < 180) {
-      return await this.imageFromUrl(cached.url);
-    }
-
     const team = await this.teamsRepository.findOne({
       where: { id: id },
     });
 
-    const file = await generateTeamMarkerImage(team);
+    let img = "teammarker-";
 
-    if (!file) {
-      return this.asFile(null);
-    }
+    if (team.majorTeam === "blue") img += "blue";
+    else img += "red";
 
-    const base64 = file.toString("base64");
-    const resultImgur = await this.imgurService.uploadImage(base64);
-
-    if (resultImgur) {
-      if (cached) {
-        await this.imgurService.deleteImage(cached.deletehash);
-        cached.url = resultImgur.link;
-        cached.updated = new Date();
-        cached.imgurId = resultImgur.id;
-        cached.deletehash = resultImgur.deletehash;
-        await this.imagesRepository.save(cached);
-      } else {
-        await this.imagesRepository.save({
-          url: resultImgur.link,
-          updated: new Date(),
-          deletehash: resultImgur.deletehash,
-          imgurId: resultImgur.id,
-          requestUrl: `${EmbedEndpoints.TEAM_MARKER}/${id}`,
-        });
-      }
-    }
-
-    return new StreamableFile(file);
+    return this.imageFromUrl(`https://cdn.deltacraft.eu/icons/${img}.svg`);
   }
 
   async generateDynmapImage(
