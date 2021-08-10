@@ -12,7 +12,12 @@ export class ChatService {
   ) {}
 
   async checkMessage(message: string): Promise<IApiPluginResponse<boolean>> {
-    const witResult = await resolveMessage(encodeURI(message));
+    const trimmed = message?.trim();
+    if (!trimmed || trimmed?.length < 1) {
+      return { content: true, message: "Prázdno" };
+    }
+
+    const witResult = await resolveMessage(encodeURIComponent(trimmed));
     if (!witResult) {
       return { content: true, message: "Ahoj, Jirko, wit nic" };
     }
@@ -34,7 +39,7 @@ export class ChatService {
         .map((x) => `${x.body} (${x.value})`)
         .join(", ");
 
-      await this.botNotifications.inappropriateMessage(message);
+      await this.botNotifications.inappropriateMessage(trimmed);
 
       throw new BoolApiException({ message: words });
     }
