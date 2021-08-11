@@ -389,12 +389,15 @@ export class EmbedService {
       where: { id: id },
     });
 
-    let img = "teammarker-";
+    const prefix = "teammarker-";
 
-    if (team.majorTeam === "blue") img += "blue";
-    else img += "red";
+    const colour = team ? (team.majorTeam === "blue" ? "blue" : "red") : "gray";
 
-    return await this.imageFromUrl(`https://cdn.deltacraft.eu/icons/${img}.svg`);
+    const img = prefix + colour;
+
+    return await this.imageFromUrl(
+      `https://cdn.deltacraft.eu/icons/${img}.svg`,
+    );
   }
 
   async generateDynmapImage(
