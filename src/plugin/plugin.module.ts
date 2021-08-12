@@ -61,5 +61,6 @@ import { StatsController } from "./stats.controller";
       useClass: ApiExceptionFilter,
     },
   ],
+  exports: [StatsService],
 })
 export class PluginModule {}

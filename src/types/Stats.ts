@@ -6,7 +6,7 @@ export interface IStatsResponse {
   stats?: IStats;
 }
 
-interface IStats {
+export interface IStats {
   mining: ITotalMiningStats;
   crafting: ITotalCraftingStats;
   mob: ITotalMobStats;
