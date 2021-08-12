@@ -22,6 +22,7 @@ import { PollVotes } from "src/db/entities/PollVotes";
 import { ConsentsResolver } from "./resolvers/consents.resolver";
 import { PubSubModule } from "src/pubsub/pubsub.module";
 import { PubSubService } from "src/pubsub/pubsub.service";
+import { StatsService } from "src/plugin/stats.service";
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { PubSubService } from "src/pubsub/pubsub.service";
     LoginSessionResolver,
     PollsResolver,
     ConsentsResolver,
+    StatsService,
   ],
 })
 export class GQLModule {}

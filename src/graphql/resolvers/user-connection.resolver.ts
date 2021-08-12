@@ -13,6 +13,7 @@ import { PUB_SUB } from "src/app.module";
 import { Points } from "src/db/entities/Points";
 import { Teams } from "src/db/entities/Teams";
 import { UserConnections } from "src/db/entities/UserConnections";
+import { StatsService } from "src/plugin/stats.service";
 import { PubSubService } from "src/pubsub/pubsub.service";
 import { IPointSummaryWrapper } from "src/types/types";
 import { calcPlayerSummary } from "src/utils/summary";
@@ -28,6 +29,7 @@ export class UserConnectionResolver {
     @InjectRepository(Points)
     private readonly pointsRepository: Repository<Points>,
     private readonly pubSubService: PubSubService,
+    private readonly statsService: StatsService,
   ) {}
 
   @Query("players")
@@ -66,6 +68,14 @@ export class UserConnectionResolver {
 
     const res = calcPlayerSummary(u);
     return res;
+  }
+
+  @ResolveField("stats")
+  async getStats(@Parent() user: UserConnections) {
+    const stats = await this.statsService.get(user.name);
+
+    if (stats.content.success) return stats.content.stats;
+    return null;
   }
 
   @Subscription("pointAdded", {
