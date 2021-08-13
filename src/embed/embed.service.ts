@@ -12,7 +12,9 @@ import { getScreenshotUrl } from "./embed/get-screenshot";
 import { generatePlayerCard } from "./embed/player-card";
 import { generatePlayerComparisonCard } from "./embed/player-comparison-card";
 import { generateHomeCard } from "./embed/player-home";
-import { generateTeamMarkerImage, getTeamCard } from "./embed/team-card";
+import { getTeamCard } from "./embed/team-card";
+import { createReadStream } from "fs";
+import { join } from "path";
 
 enum EmbedEndpoints {
   PLAYER_COMPARISON = "player-comparison",
@@ -385,48 +387,17 @@ export class EmbedService {
   }
 
   async generateTeamMarker(id: string): Promise<StreamableFile> {
-    const cached = await this.imagesRepository.findOne({
-      where: {
-        requestUrl: `${EmbedEndpoints.TEAM_MARKER}/${id}`,
-      },
-    });
-
-    if (cached && minutesBetween(cached.updated, new Date()) < 180) {
-      return await this.imageFromUrl(cached.url);
-    }
-
     const team = await this.teamsRepository.findOne({
       where: { id: id },
     });
 
-    const file = await generateTeamMarkerImage(team);
+    const prefix = "teammarker-";
 
-    if (!file) {
-      return this.asFile(null);
-    }
+    const colour = team ? (team.majorTeam === "blue" ? "blue" : "red") : "gray";
 
-    const base64 = file.toString("base64");
-    const resultImgur = await this.imgurService.uploadImage(base64);
+    const img = prefix + colour + ".svg";
 
-    if (resultImgur) {
-      if (cached) {
-        await this.imgurService.deleteImage(cached.deletehash);
-        cached.url = resultImgur.link;
-        cached.updated = new Date();
-        cached.imgurId = resultImgur.id;
-        cached.deletehash = resultImgur.deletehash;
-        await this.imagesRepository.save(cached);
-      } else {
-        await this.imagesRepository.save({
-          url: resultImgur.link,
-          updated: new Date(),
-          deletehash: resultImgur.deletehash,
-          imgurId: resultImgur.id,
-          requestUrl: `${EmbedEndpoints.TEAM_MARKER}/${id}`,
-        });
-      }
-    }
-
+    const file = createReadStream(join(process.cwd(), "assets", "icons", img));
     return new StreamableFile(file);
   }
 
