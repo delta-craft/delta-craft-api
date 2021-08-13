@@ -12,7 +12,9 @@ import { getScreenshotUrl } from "./embed/get-screenshot";
 import { generatePlayerCard } from "./embed/player-card";
 import { generatePlayerComparisonCard } from "./embed/player-comparison-card";
 import { generateHomeCard } from "./embed/player-home";
-import { generateTeamMarkerImage, getTeamCard } from "./embed/team-card";
+import { getTeamCard } from "./embed/team-card";
+import { createReadStream } from "fs";
+import { join } from "path";
 
 enum EmbedEndpoints {
   PLAYER_COMPARISON = "player-comparison",
@@ -393,11 +395,10 @@ export class EmbedService {
 
     const colour = team ? (team.majorTeam === "blue" ? "blue" : "red") : "gray";
 
-    const img = prefix + colour;
+    const img = prefix + colour + ".svg";
 
-    return await this.imageFromUrl(
-      `https://cdn.deltacraft.eu/icons/${img}.svg`,
-    );
+    const file = createReadStream(join(process.cwd(), "assets", "icons", img));
+    return new StreamableFile(file);
   }
 
   async generateDynmapImage(

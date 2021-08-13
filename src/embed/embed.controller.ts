@@ -66,7 +66,7 @@ export class EmbedController {
 
   @Get("teammarker/:id")
   @ApiParam({ name: "id", example: "1" })
-  @Header("content-type", "image/png")
+  @Header("content-type", "image/svg+xml")
   async getTeamMarker(@Param("id") id: string): Promise<EmbedFile> {
     return await this.embedService.generateTeamMarker(id);
   }
