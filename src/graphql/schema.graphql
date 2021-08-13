@@ -134,7 +134,7 @@ type CraftingMiningStatData {
 
 type MobStat {
   totalPoints: Int
-  data: [CraftingMiningStatData]
+  data: [MobStatData]
 }
 
 type MobStatData {
