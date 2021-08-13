@@ -34,7 +34,11 @@ export class UserConnectionResolver {
 
   @Query("players")
   async players(): Promise<UserConnections[]> {
-    return await this.uConnRepository.find();
+    const players = await this.uConnRepository.find({ relations: ["team"] });
+
+    return players.filter(
+      (x) => x?.team?.majorTeam === "blue" || x?.team?.majorTeam === "red",
+    );
   }
 
   @Query("player")
