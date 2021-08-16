@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { BotNotificationService } from "src/bot/notification.service";
 import { IApiPluginResponse } from "src/types/ApiResponse";
+import { BoolApiException } from "src/types/exceptions/api.exception";
 import resolveMessage, { Positivity } from "src/utils/wit-client";
 
 @Injectable()
@@ -11,7 +12,12 @@ export class ChatService {
   ) {}
 
   async checkMessage(message: string): Promise<IApiPluginResponse<boolean>> {
-    const witResult = await resolveMessage(encodeURI(message));
+    const trimmed = message?.trim();
+    if (!trimmed || trimmed?.length < 1) {
+      return { content: true, message: "Prázdno" };
+    }
+
+    const witResult = await resolveMessage(encodeURIComponent(trimmed));
     if (!witResult) {
       return { content: true, message: "Ahoj, Jirko, wit nic" };
     }
@@ -33,9 +39,9 @@ export class ChatService {
         .map((x) => `${x.body} (${x.value})`)
         .join(", ");
 
-        await this.botNotifications.inappropriateMessage(message);
+      await this.botNotifications.inappropriateMessage(trimmed);
 
-      return { content: false, message: words };
+      throw new BoolApiException({ message: words });
     }
 
     return {

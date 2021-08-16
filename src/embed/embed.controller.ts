@@ -64,6 +64,13 @@ export class EmbedController {
     return await this.embedService.generateTeamCard(id);
   }
 
+  @Get("teammarker/:id")
+  @ApiParam({ name: "id", example: "1" })
+  @Header("content-type", "image/svg+xml")
+  async getTeamMarker(@Param("id") id: string): Promise<EmbedFile> {
+    return await this.embedService.generateTeamMarker(id);
+  }
+
   @Get("dynmap/:world/:x/:y/:z")
   @Header("content-type", "image/png")
   @ApiParam({ name: "world", example: "world" })

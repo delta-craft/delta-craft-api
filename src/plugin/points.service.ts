@@ -1,14 +1,19 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { PubSub } from "apollo-server-express";
+import { PUB_SUB } from "src/app.module";
 import { BotNotificationService } from "src/bot/notification.service";
 import { Points } from "src/db/entities/Points";
 import { PointTags } from "src/db/entities/PointTags";
 import { UserConnections } from "src/db/entities/UserConnections";
+import { PubSubService } from "src/pubsub/pubsub.service";
+
 import {
   IApiPluginResponse,
   PluginApiError,
   PointsError,
 } from "src/types/ApiResponse";
+import { BoolApiException } from "src/types/exceptions/api.exception";
 import { IPointPartial } from "src/types/points/IPointsInput";
 import { filterUniqueInArray, isUuidValid } from "src/utils/checks";
 import { Repository } from "typeorm";
@@ -24,6 +29,7 @@ export class PointsService {
     private readonly ucRepository: Repository<UserConnections>,
     @Inject(BotNotificationService)
     private readonly botNotifications: BotNotificationService,
+    private readonly pubSubService: PubSubService,
   ) {}
 
   async addPoints(data: IPointPartial[]): Promise<IApiPluginResponse<boolean>> {
@@ -33,11 +39,10 @@ export class PointsService {
       .filter(filterUniqueInArray);
 
     if (uuids.length < 1) {
-      return {
-        content: false,
+      throw new BoolApiException({
         error: PointsError.NoPlayers,
         message: "UUID array was empty",
-      };
+      });
     }
 
     const uidFilter = uuids.map((x) => {
@@ -47,11 +52,10 @@ export class PointsService {
     const ucs = await this.ucRepository.find({ where: [...uidFilter] });
 
     if (!ucs || ucs.length < 1) {
-      return {
-        content: false,
+      throw new BoolApiException({
         error: PointsError.NoPlayers,
         message: "No UserConnections found in DB",
-      };
+      });
     }
 
     let tags: PointTags[] = [];
@@ -70,6 +74,10 @@ export class PointsService {
 
           const resPoint = await this.pointsRepository.save(p);
 
+          await this.pubSubService.pubSub.publish("pointAdded", {
+            pointAdded: resPoint,
+          });
+
           if (point.pointTags && point.pointTags.length > 0) {
             for (const pt of point.pointTags) {
               const pointTag = new PointTags();
@@ -82,12 +90,15 @@ export class PointsService {
         }
       }
       await this.pointTagsRepository.save(tags);
-    } catch (err) {
-      return {
-        content: false,
-        error: PluginApiError.Unknown,
-        message: err?.toString(),
-      };
+    } catch (ex) {
+      throw new BoolApiException(
+        {
+          error: PluginApiError.Unknown,
+          message: ex?.toString(),
+        },
+        true,
+        ex,
+      );
     }
 
     await this.botNotifications.logPoints();

@@ -7,8 +7,15 @@ import { getScreenshot } from "./get-screenshot";
 export const getTeamCard = async (team: Teams): Promise<Buffer> => {
   const { summary, ratios } = calcTeamSummary(team);
   const html = getTeamCardHtml(team, summary, ratios);
-  const file = await getScreenshot(html, true);
-  return file;
+  try {
+    const file = await getScreenshot(html, true);
+
+    return file;
+  } catch (err) {
+    console.log(err);
+    //res.status(405).json({ error: err });
+    return null;
+  }
 };
 
 const getCss = (theme: string, fontSize: string) => {
@@ -317,4 +324,62 @@ const getTeamCardHtml = (
         </div>
     </body>
 </html>`;
+};
+
+export const generateTeamMarkerImage = async (
+  team: Teams | null,
+): Promise<Buffer> => {
+  try {
+    const html = getTeamMarkerCardHtml(team);
+
+    const file = await getScreenshot(html, true, 32, 32);
+
+    return file;
+  } catch (err) {
+    console.log(err);
+    //res.status(405).json({ error: err });
+    return null;
+  }
+};
+
+const getTeamMarkerCardHtml = (team: Teams | null) => {
+  const content = team
+    ? ' <img src="https://img.icons8.com/material-outlined/32/000000/info.png" />'
+    : ' <img src="https://img.icons8.com/material-outlined/32/000000/info.png" />';
+
+  return `<!DOCTYPE html>
+  <html>
+      <meta charset="utf-8">
+      <title>Generated Image</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+      ${getTeamCss("dark", "52px")}
+      </style>
+      <body>
+         ${content}
+      </body>
+  </html>`;
+};
+
+const getTeamCss = (theme: string, fontSize: string): string => {
+  let background = "white";
+  let foreground = "black";
+  let radial = "lightgray";
+
+  if (theme === "dark") {
+    background = "black";
+    foreground = "white";
+    radial = "dimgray";
+  }
+  return `
+  
+      body {
+          background: none;
+          height: 100vh;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+      }
+  
+    `;
 };

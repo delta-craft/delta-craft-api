@@ -19,6 +19,12 @@ import { FcmTokens } from "src/db/entities/FcmTokens";
 import { ServerLogins } from "src/db/entities/ServerLogins";
 import { Consents } from "src/db/entities/Consents";
 import { BotModule } from "src/bot/bot.module";
+import { PubSubModule } from "src/pubsub/pubsub.module";
+import { PubSubService } from "src/pubsub/pubsub.service";
+import { APP_FILTER } from "@nestjs/core";
+import { ApiExceptionFilter } from "src/utils/api-exception.filter";
+import { StatsService } from "./stats.service";
+import { StatsController } from "./stats.controller";
 
 @Module({
   imports: [
@@ -33,6 +39,7 @@ import { BotModule } from "src/bot/bot.module";
       Consents,
     ]),
     BotModule,
+    PubSubModule,
   ],
   controllers: [
     PointsController,
@@ -40,6 +47,7 @@ import { BotModule } from "src/bot/bot.module";
     TeamController,
     SessionController,
     LoginController,
+    StatsController,
   ],
   providers: [
     PointsService,
@@ -47,6 +55,12 @@ import { BotModule } from "src/bot/bot.module";
     TeamService,
     SessionService,
     LoginService,
+    StatsService,
+    {
+      provide: APP_FILTER,
+      useClass: ApiExceptionFilter,
+    },
   ],
+  exports: [StatsService],
 })
 export class PluginModule {}

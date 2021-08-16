@@ -13,11 +13,16 @@ import { generatePlayerCard } from "./embed/player-card";
 import { generatePlayerComparisonCard } from "./embed/player-comparison-card";
 import { generateHomeCard } from "./embed/player-home";
 import { getTeamCard } from "./embed/team-card";
+import { createReadStream } from "fs";
+import { join } from "path";
 
 enum EmbedEndpoints {
   PLAYER_COMPARISON = "player-comparison",
   PLAYER_CARD = "player-card",
   TEAM_CARD = "team-card",
+  PLAYER_HEAD = "player-head",
+  PLAYER_HOME = "player-home",
+  TEAM_MARKER = "team-marker",
 }
 
 @Injectable()
@@ -33,6 +38,16 @@ export class EmbedService {
   ) {}
 
   async generatePlayerHead(uuid: string): Promise<StreamableFile | null> {
+    const cached = await this.imagesRepository.findOne({
+      where: {
+        requestUrl: `${EmbedEndpoints.PLAYER_HEAD}/${uuid}`,
+      },
+    });
+
+    if (cached && minutesBetween(cached.updated, new Date()) < 180) {
+      return await this.imageFromUrl(cached.url);
+    }
+
     const uConn = await this.uConnRepository.findOne({ where: { uid: uuid } });
 
     if (!uConn) {
@@ -44,7 +59,30 @@ export class EmbedService {
       );
 
       if (img.status !== 200) {
-        return null;
+        return this.asFile(null);
+      }
+
+      const buffer = Buffer.from(img.data);
+      const base64 = buffer.toString("base64");
+      const resultImgur = await this.imgurService.uploadImage(base64);
+
+      if (resultImgur) {
+        if (cached) {
+          await this.imgurService.deleteImage(cached.deletehash);
+          cached.url = resultImgur.link;
+          cached.updated = new Date();
+          cached.imgurId = resultImgur.id;
+          cached.deletehash = resultImgur.deletehash;
+          await this.imagesRepository.save(cached);
+        } else {
+          await this.imagesRepository.save({
+            url: resultImgur.link,
+            updated: new Date(),
+            deletehash: resultImgur.deletehash,
+            imgurId: resultImgur.id,
+            requestUrl: `${EmbedEndpoints.PLAYER_HEAD}/${uuid}`,
+          });
+        }
       }
 
       return this.asFile(img.data);
@@ -58,12 +96,46 @@ export class EmbedService {
     );
 
     if (img.status !== 200) {
-      return null;
+      return this.asFile(null);
     }
+
+    const buffer = Buffer.from(img.data);
+    const base64 = buffer.toString("base64");
+    const resultImgur = await this.imgurService.uploadImage(base64);
+
+    if (resultImgur) {
+      if (cached) {
+        await this.imgurService.deleteImage(cached.deletehash);
+        cached.url = resultImgur.link;
+        cached.updated = new Date();
+        cached.imgurId = resultImgur.id;
+        cached.deletehash = resultImgur.deletehash;
+        await this.imagesRepository.save(cached);
+      } else {
+        await this.imagesRepository.save({
+          url: resultImgur.link,
+          updated: new Date(),
+          deletehash: resultImgur.deletehash,
+          imgurId: resultImgur.id,
+          requestUrl: `${EmbedEndpoints.PLAYER_HEAD}/${uuid}`,
+        });
+      }
+    }
+
     return this.asFile(img.data);
   }
 
   async generatePlayerHome(nick: string): Promise<StreamableFile> {
+    const cached = await this.imagesRepository.findOne({
+      where: {
+        requestUrl: `${EmbedEndpoints.PLAYER_HOME}/${nick}`,
+      },
+    });
+
+    if (cached && minutesBetween(cached.updated, new Date()) < 180) {
+      return await this.imageFromUrl(cached.url);
+    }
+
     const uc = await this.uConnRepository.findOne({
       where: { name: nick },
     });
@@ -83,6 +155,32 @@ export class EmbedService {
     const teamColour = team.majorTeam ?? "black";
 
     const file = await generateHomeCard(nick, teamColour);
+
+    if (!file) {
+      return this.asFile(null);
+    }
+
+    const base64 = file.toString("base64");
+    const resultImgur = await this.imgurService.uploadImage(base64);
+
+    if (resultImgur) {
+      if (cached) {
+        await this.imgurService.deleteImage(cached.deletehash);
+        cached.url = resultImgur.link;
+        cached.updated = new Date();
+        cached.imgurId = resultImgur.id;
+        cached.deletehash = resultImgur.deletehash;
+        await this.imagesRepository.save(cached);
+      } else {
+        await this.imagesRepository.save({
+          url: resultImgur.link,
+          updated: new Date(),
+          deletehash: resultImgur.deletehash,
+          imgurId: resultImgur.id,
+          requestUrl: `${EmbedEndpoints.PLAYER_HOME}/${nick}`,
+        });
+      }
+    }
 
     return new StreamableFile(file);
   }
@@ -104,7 +202,7 @@ export class EmbedService {
     });
 
     if (!uc) {
-      return null;
+      return this.asFile(null);
     }
 
     const { team } = uc;
@@ -118,6 +216,10 @@ export class EmbedService {
       summary,
       ratios,
     );
+
+    if (!file) {
+      return this.asFile(null);
+    }
 
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
@@ -174,7 +276,7 @@ export class EmbedService {
     });
 
     if (!uc1 || !uc2) {
-      return null;
+      return this.asFile(null);
     }
 
     const { team: team1 } = uc1;
@@ -199,6 +301,10 @@ export class EmbedService {
         summary: sum2,
       },
     );
+
+    if (!file) {
+      return this.asFile(null);
+    }
 
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
@@ -246,10 +352,14 @@ export class EmbedService {
     });
 
     if (!team) {
-      return null;
+      return this.asFile(null);
     }
 
     const file = await getTeamCard(team);
+
+    if (!file) {
+      return this.asFile(null);
+    }
 
     const base64 = file.toString("base64");
     const resultImgur = await this.imgurService.uploadImage(base64);
@@ -276,20 +386,40 @@ export class EmbedService {
     return new StreamableFile(file);
   }
 
+  async generateTeamMarker(id: string): Promise<StreamableFile> {
+    const team = await this.teamsRepository.findOne({
+      where: { id: id },
+    });
+
+    const prefix = "teammarker-";
+
+    const colour = team ? (team.majorTeam === "blue" ? "blue" : "red") : "gray";
+
+    const img = prefix + colour + ".svg";
+
+    const file = createReadStream(join(process.cwd(), "assets", "icons", img));
+    return new StreamableFile(file);
+  }
+
   async generateDynmapImage(
     world: string,
     x: string,
     y: string,
     z: string,
   ): Promise<StreamableFile> {
-    const file = await getScreenshotUrl(
-      `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
-      true,
-      1920,
-      1080,
-    );
+    try {
+      const file = await getScreenshotUrl(
+        `https://map.deltacraft.eu/#${world}:${x}:${y}:${z}:50:0:0:0:0:perspective`,
+        true,
+        1920,
+        1080,
+      );
 
-    return new StreamableFile(file);
+      return new StreamableFile(file);
+    } catch (err) {
+      console.log(err);
+      return this.asFile(null);
+    }
   }
 
   private asFile(arrayBuffer: ArrayBuffer): StreamableFile | null {
@@ -306,7 +436,7 @@ export class EmbedService {
     });
 
     if (img.status !== 200) {
-      return null;
+      return this.asFile(null);
     }
 
     return this.asFile(img.data);

@@ -1,7 +1,7 @@
-import { Controller, Get, HttpCode, Query, UseGuards } from "@nestjs/common";
-import { ApiQuery, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { ApiResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "src/guards/auth.guard";
-import { IApiPluginResponse } from "src/types/ApiResponse";
+import { BoolApiResponse, IApiPluginResponse } from "src/types/ApiResponse";
 import { ChatService } from "./chat.service";
 
 @UseGuards(AuthGuard)
@@ -12,8 +12,7 @@ export class ChatController {
 
   @Get("check")
   @ApiQuery({ name: "message", example: "Ahoj, jak to jde?" })
-  @HttpCode(200)
-  @HttpCode(400)
+  @ApiResponse({ type: BoolApiResponse })
   async check(
     @Query("message") message: string,
   ): Promise<IApiPluginResponse<boolean>> {

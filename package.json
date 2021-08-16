@@ -5,6 +5,10 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "16.6.x",
+    "yarn": "1.22.5"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -27,11 +31,13 @@
     "@nestjs/graphql": "8.0.2",
     "@nestjs/platform-express": "^8.0.5",
     "@nestjs/schedule": "^1.0.1",
+    "@nestjs/platform-socket.io": "^8.0.6",
     "@nestjs/serve-static": "^2.2.2",
     "@nestjs/swagger": "^5.0.9",
     "@nestjs/typeorm": "^8.0.1",
+    "@nestjs/websockets": "^8.0.6",
     "@ntegral/nestjs-sentry": "^3.0.3",
-    "@sentry/node": "^6.10.0",
+    "@sentry/node": "^6.11.0",
     "apollo-server-core": "^3.1.1",
     "apollo-server-express": "2.25.2",
     "axios": "^0.21.1",
@@ -45,7 +51,7 @@
     "playwright-chromium": "^1.13.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0",
+    "rxjs": "7",
     "swagger-ui-express": "^4.1.6",
     "twemoji": "^13.1.0",
     "typeorm": "^0.2.35"

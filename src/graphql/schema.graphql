@@ -55,6 +55,7 @@ type UserConnections {
   consent: Date
   points: [Point]
   pointSummary: PointSummaryWrapper
+  stats: Stats
 }
 
 type LoginSession {
@@ -70,6 +71,7 @@ type Team {
   name: String
   teamColourHex: String
   majorTeam: String
+  ownerConnId: ID
   userConnections: [UserConnections]
   pointSummary: PointSummaryWrapper
 }
@@ -108,6 +110,36 @@ type PollVotes {
   pollOptionId: ID
   pollOption: PollOption
   connection: UserConnections
+}
+
+type Subscription {
+  pointAdded(userId: ID!): Point
+}
+
+type Stats {
+  mining: CraftingMiningStat
+  crafting: CraftingMiningStat
+  mob: MobStat
+}
+
+type CraftingMiningStat {
+  totalPoints: Int
+  data: [CraftingMiningStatData]
+}
+
+type CraftingMiningStatData {
+  material: String
+  count: Int
+}
+
+type MobStat {
+  totalPoints: Int
+  data: [MobStatData]
+}
+
+type MobStatData {
+  entity: String
+  count: Int
 }
 
 type Query {

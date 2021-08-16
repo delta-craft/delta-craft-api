@@ -20,6 +20,9 @@ import { PollOptions } from "src/db/entities/PollOptions";
 import { Polls } from "src/db/entities/Polls";
 import { PollVotes } from "src/db/entities/PollVotes";
 import { ConsentsResolver } from "./resolvers/consents.resolver";
+import { PubSubModule } from "src/pubsub/pubsub.module";
+import { PubSubService } from "src/pubsub/pubsub.service";
+import { StatsService } from "src/plugin/stats.service";
 
 @Module({
   imports: [
@@ -38,6 +41,7 @@ import { ConsentsResolver } from "./resolvers/consents.resolver";
       Polls,
       PollOptions,
     ]),
+    PubSubModule,
   ],
   providers: [
     UserConnectionResolver,
@@ -47,6 +51,7 @@ import { ConsentsResolver } from "./resolvers/consents.resolver";
     LoginSessionResolver,
     PollsResolver,
     ConsentsResolver,
+    StatsService,
   ],
 })
 export class GQLModule {}

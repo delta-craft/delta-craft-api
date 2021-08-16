@@ -9,6 +9,7 @@ import {
   PluginApiError,
   ValidateError,
 } from "src/types/ApiResponse";
+import { BoolApiException } from "src/types/exceptions/api.exception";
 import { ILoginData } from "src/types/ILogin";
 import { isIPv4Valid, isUuidValid } from "src/utils/checks";
 import { newLoginNotification } from "src/utils/new-login-notification";
@@ -30,25 +31,27 @@ export class LoginService {
   async newLogin(data: ILoginData): Promise<IApiPluginResponse<boolean>> {
     const { uuid, ip } = data;
     if (!isUuidValid(uuid)) {
-      return { content: false, error: PluginApiError.UuidNotValid };
+      throw new BoolApiException({ error: PluginApiError.UuidNotValid });
     }
 
     if (!ip) {
-      return { content: false, error: PluginApiError.Unknown };
+      throw new BoolApiException({ error: PluginApiError.Unknown }, true);
     }
 
     if (!isIPv4Valid(ip)) {
-      return {
-        content: false,
-        error: PluginApiError.Unknown,
-        message: "Invalid IP",
-      };
+      throw new BoolApiException(
+        {
+          error: PluginApiError.Unknown,
+          message: "Invalid IP",
+        },
+        true,
+      );
     }
 
     const uConn = await this.ucRepository.findOne({ where: { uid: uuid } });
 
     if (!uConn) {
-      return { content: false, error: ValidateError.NotRegistered };
+      throw new BoolApiException({ error: ValidateError.NotRegistered });
     }
 
     try {
@@ -82,9 +85,9 @@ export class LoginService {
       });
 
       await newLoginNotification(tokens.map((x) => x.token));
-    } catch (error) {
-      console.log(error);
-      return { content: false, error: PluginApiError.Unknown };
+    } catch (ex) {
+      console.log(ex);
+      throw new BoolApiException({ error: PluginApiError.Unknown }, true, ex);
     }
     return { content: true };
   }
@@ -94,11 +97,11 @@ export class LoginService {
     nick: string,
   ): Promise<IApiPluginResponse<boolean>> {
     if (!nick || !uid) {
-      return { content: false, error: ValidateError.ArgumentsError };
+      throw new BoolApiException({ error: ValidateError.ArgumentsError });
     }
 
     if (!isUuidValid(uid)) {
-      return { content: false, error: ValidateError.UuidNotValid };
+      throw new BoolApiException({ error: ValidateError.UuidNotValid });
     }
 
     const result = await this.ucRepository.find({
@@ -106,21 +109,21 @@ export class LoginService {
     });
 
     if (!result || result.length < 1) {
-      return { content: false, error: ValidateError.NotRegistered };
+      throw new BoolApiException({ error: ValidateError.NotRegistered });
     }
 
     const firstByUid = result.find((x) => x.uid === uid);
 
     if (firstByUid) {
       if (!(await this.validateUserConsent(firstByUid))) {
-        return { content: false, error: ValidateError.MissingConsent };
+        throw new BoolApiException({ error: ValidateError.MissingConsent });
       }
 
       if (firstByUid.teamId !== null && firstByUid.teamId > 0) {
         return { content: true };
       }
 
-      return { content: false, error: ValidateError.NotInTeam };
+      throw new BoolApiException({ error: ValidateError.NotInTeam });
     }
 
     const firstByName = result.find((x) => x.name === nick);
@@ -132,17 +135,17 @@ export class LoginService {
       }
 
       if (!(await this.validateUserConsent(firstByName))) {
-        return { content: false, error: ValidateError.MissingConsent };
+        throw new BoolApiException({ error: ValidateError.MissingConsent });
       }
 
       if (firstByName.teamId !== null && firstByName.teamId > 0) {
         return { content: true };
       }
 
-      return { content: false, error: ValidateError.NotInTeam };
+      throw new BoolApiException({ error: ValidateError.NotInTeam });
     }
 
-    return { content: false, error: ValidateError.MissingName };
+    throw new BoolApiException({ error: ValidateError.MissingName });
   }
 
   async logoutAll(): Promise<IApiPluginResponse<boolean>> {
@@ -154,7 +157,7 @@ export class LoginService {
         .execute();
     } catch (ex) {
       console.log(ex);
-      return { content: false, error: PluginApiError.Unknown };
+      throw new BoolApiException({ error: PluginApiError.Unknown }, true, ex);
     }
 
     return { content: true };

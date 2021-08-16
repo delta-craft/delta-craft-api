@@ -10,6 +10,10 @@ import {
   PluginApiError,
   ValidateError,
 } from "src/types/ApiResponse";
+import {
+  BoolApiException,
+  PluginApiException,
+} from "src/types/exceptions/api.exception";
 import { LoginData } from "src/types/ILogin";
 import ISessionResponse from "src/types/Sessions";
 import { isIPv4Valid, isUuidValid, minutesBetween } from "src/utils/checks";
@@ -33,29 +37,29 @@ export class SessionService {
     ip: string,
   ): Promise<IApiPluginResponse<ISessionResponse>> {
     if (!isUuidValid(uuid))
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: PluginApiError.UuidNotValid,
         message: "Invalid UUID",
-      };
+      });
 
     if (!isIPv4Valid(ip))
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: PluginApiError.Unknown,
         message: "Invalid IP",
-      };
+      });
 
     const uConn = await this.uConnRepository.findOne({
       where: { uid: uuid },
     });
 
     if (!uConn) {
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: ValidateError.NotRegistered,
         message: "Not registered",
-      };
+      });
     }
 
     const session = await this.sessionRepository.findOne({
@@ -63,19 +67,19 @@ export class SessionService {
     });
 
     if (!session) {
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: PluginApiError.Unknown,
         message: "Session not found",
-      };
+      });
     }
 
     if (!session.updated || !session.authRequest) {
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: LoginError.SessionExpired,
         message: "Session not requested or not active",
-      };
+      });
     }
 
     if (session.auth == false || session.ip !== ip) {
@@ -87,11 +91,11 @@ export class SessionService {
       session.authRequest = null;
       await this.sessionRepository.save(session);
 
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: LoginError.Denied,
         message: "Login was either denied or IP has changed",
-      };
+      });
     }
 
     const timeDiff = minutesBetween(new Date(), session.updated);
@@ -105,11 +109,11 @@ export class SessionService {
       session.authRequest = null;
       await this.sessionRepository.save(session);
 
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: LoginError.SessionExpired,
         message: `Session expired (time diff was ${timeDiff})`,
-      };
+      });
     }
 
     if (session.auth == null) {
@@ -121,11 +125,11 @@ export class SessionService {
       session.authRequest = null;
       await this.sessionRepository.save(session);
 
-      return {
+      throw new PluginApiException<ISessionResponse>({
         content: { success: false },
         error: LoginError.SessionExpired,
         message: "Session was never authenticated",
-      };
+      });
     }
 
     await this.logLogin(uConn, ip);
@@ -141,7 +145,11 @@ export class SessionService {
       };
     }
 
-    const t = { id: team.id, majorTeam: team.majorTeam, name: team.name };
+    const t = {
+      id: team.id,
+      majorTeam: team.majorTeam,
+      name: team.name.trim().replace(" ", "-"),
+    };
 
     return { content: { success: true, team: t }, message: "Hurray" };
   }
@@ -161,27 +169,24 @@ export class SessionService {
   async updateSession(params: LoginData): Promise<IApiPluginResponse<boolean>> {
     const { uuid, ip } = params;
     if (!isUuidValid(uuid))
-      return {
-        content: false,
+      throw new BoolApiException({
         error: PluginApiError.UuidNotValid,
         message: "Invalid UUID",
-      };
+      });
 
     if (!isIPv4Valid(ip))
-      return {
-        content: false,
+      throw new BoolApiException({
         error: PluginApiError.Unknown,
         message: "Invalid IP",
-      };
+      });
 
     const uConn = await this.uConnRepository.findOne({ where: { uid: uuid } });
 
     if (!uConn) {
-      return {
-        content: false,
+      throw new BoolApiException({
         error: ValidateError.NotRegistered,
         message: "Not registered",
-      };
+      });
     }
 
     const session = await this.sessionRepository.findOne({
@@ -189,19 +194,17 @@ export class SessionService {
     });
 
     if (!session) {
-      return {
-        content: false,
+      throw new BoolApiException({
         error: PluginApiError.Unknown,
         message: "Session not found",
-      };
+      });
     }
 
     if (session.ip !== ip) {
-      return {
-        content: false,
+      throw new BoolApiException({
         error: LoginError.IPMismatch,
         message: "IP has changed",
-      };
+      });
     }
 
     session.updated = new Date();
@@ -210,11 +213,14 @@ export class SessionService {
       await this.sessionRepository.save(session);
       return { content: true };
     } catch (ex) {
-      return {
-        content: false,
-        error: PluginApiError.Unknown,
-        message: ex.toString(),
-      };
+      throw new BoolApiException(
+        {
+          error: PluginApiError.Unknown,
+          message: ex.toString(),
+        },
+        true,
+        ex,
+      );
     }
   }
 }

@@ -24,17 +24,21 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { GQLModule } from "./graphql/graphql.module";
 import { BotModule } from "./bot/bot.module";
 import { DiscordsrvAccounts } from "./db/entities/DiscordsrvAccounts";
-import { SentryModule } from "@ntegral/nestjs-sentry";
+import { GraphqlInterceptor, SentryModule } from "@ntegral/nestjs-sentry";
 import { LogLevel } from "@sentry/types";
-import { APP_FILTER } from "@nestjs/core";
-import { SentryExceptionFilter } from "./utils/sentry-exception.filter";
+import { APP_INTERCEPTOR } from "@nestjs/core";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
 import { TwitterModule } from "./bot/twitter/twitter.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { Images } from "./db/entities/Images";
+import { PubSub } from "apollo-server-express";
+import { DateModule } from './date/date.module';
+
+export const PUB_SUB = "PUB_SUB";
 
 @Module({
   imports: [
+    DateModule,
     PluginModule,
     EmbedModule,
     GQLModule,
@@ -80,11 +84,9 @@ import { Images } from "./db/entities/Images";
     // Configure GraphQL
     GraphQLModule.forRoot({
       debug: false,
+      installSubscriptionHandlers: true,
       typePaths: ["./**/*.graphql"],
-      // definitions: {
-      //   path: join(process.cwd(), "src/graphql/graphql.ts"),
-      // },
-      // playground: true,
+      introspection: true,
       plugins: [],
     }),
     SentryModule.forRoot({
@@ -99,10 +101,15 @@ import { Images } from "./db/entities/Images";
   ],
   providers: [
     {
-      provide: APP_FILTER,
-      useClass: SentryExceptionFilter,
+      provide: APP_INTERCEPTOR,
+      useClass: GraphqlInterceptor,
+    },
+    {
+      provide: PUB_SUB,
+      useValue: new PubSub(),
     },
   ],
+  exports: [PUB_SUB],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
