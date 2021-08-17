@@ -106,7 +106,7 @@ const getTwitterHtml = (stats: ITwitterStats) => {
 
     .grid-container {
         display: grid;
-        grid-template-columns: 0.1fr 1fr .75fr 1fr 0.1fr;
+        grid-template-columns: 0.1fr 1fr 0.7fr 1fr 0.1fr;
         grid-template-rows: 1fr;
         gap: 10px 9px;
         grid-auto-flow: row;
@@ -283,7 +283,7 @@ const getTwitterHtml = (stats: ITwitterStats) => {
                             </div>
                         </div>
                         <div class="PlayerPoints">
-                            ${x.sum} bodů
+                            ${x.sum}<br/>bodů
                         </div>
                     </div>`,
                                       )
@@ -355,7 +355,7 @@ const getTwitterHtml = (stats: ITwitterStats) => {
                             </div>
                         </div>
                         <div class="PlayerPoints">
-                            ${x.sum} bodů
+                            ${x.sum}<br/>bodů
                         </div>
                     </div>`,
                   )
