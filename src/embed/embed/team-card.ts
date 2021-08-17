@@ -342,7 +342,7 @@ export const generateTeamMarkerImage = async (
   }
 };
 
-const getTeamMarkerCardHtml = (team: Teams | null) => {
+const getTeamMarkerCardHtml = (team?: Teams) => {
   const content = team
     ? ' <img src="https://img.icons8.com/material-outlined/32/000000/info.png" />'
     : ' <img src="https://img.icons8.com/material-outlined/32/000000/info.png" />';

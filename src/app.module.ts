@@ -28,6 +28,8 @@ import { GraphqlInterceptor, SentryModule } from "@ntegral/nestjs-sentry";
 import { LogLevel } from "@sentry/types";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { SetryLoggerMiddleware } from "./utils/setry-logger.middleware";
+import { TwitterModule } from "./bot/twitter/twitter.module";
+import { ScheduleModule } from "@nestjs/schedule";
 import { Images } from "./db/entities/Images";
 import { PubSub } from "apollo-server-express";
 import { DateModule } from './date/date.module';
@@ -94,6 +96,8 @@ export const PUB_SUB = "PUB_SUB";
       release: null,
       logLevel: LogLevel.Debug,
     }),
+    ScheduleModule.forRoot(),
+    TwitterModule,
   ],
   providers: [
     {
