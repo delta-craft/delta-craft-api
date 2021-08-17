@@ -7,7 +7,7 @@ import {
   Args,
   Subscription,
 } from "@nestjs/graphql";
-import { InjectRepository } from "@nestjs/typeorm";
+import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { PubSub } from "apollo-server-express";
 import { PUB_SUB } from "src/app.module";
 import { Points } from "src/db/entities/Points";
@@ -17,7 +17,7 @@ import { StatsService } from "src/plugin/stats.service";
 import { PubSubService } from "src/pubsub/pubsub.service";
 import { IPointSummaryWrapper } from "src/types/types";
 import { calcPlayerSummary } from "src/utils/summary";
-import { Repository } from "typeorm";
+import { EntityManager, Repository } from "typeorm";
 
 @Resolver("UserConnections")
 export class UserConnectionResolver {
